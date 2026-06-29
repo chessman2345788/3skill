@@ -1,0 +1,26 @@
+# Node dependencies and build files
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Python compiled files and environments
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/.pytest_cache/
+backend/venv/
+backend/env/
+backend/ENV/
+
+# Serialized ML assets (dynamically compiled on deploy build steps)
+backend/*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini

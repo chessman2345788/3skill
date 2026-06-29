@@ -1,0 +1,63 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-sans transition-colors duration-300;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Outfit', sans-serif;
+  }
+}
+
+@layer utilities {
+  /* Ultra-Premium Glassmorphism Panels */
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 10px 40px -10px rgba(15, 23, 42, 0.05);
+  }
+
+  .dark .glass-panel {
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-shadow: 0 12px 50px -12px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Interactive Glass Cards */
+  .glass-card {
+    @apply glass-panel rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:border-brand-500/20 dark:hover:border-brand-400/20;
+  }
+
+  /* Brand and State Gradient Texts */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-500 via-sky-500 to-indigo-500 dark:from-brand-400 dark:via-sky-400 dark:to-indigo-400;
+  }
+
+  .text-gradient-fake {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-red-500 to-pink-600 dark:from-red-400 dark:to-pink-500;
+  }
+
+  .text-gradient-genuine {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-teal-600 dark:from-emerald-400 dark:to-teal-500;
+  }
+
+  /* Scrollbar Aesthetics */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700;
+  }
+}
