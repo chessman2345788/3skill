@@ -76,7 +76,7 @@ export default function About() {
               { title: 'Punctuation', desc: 'Clears symbols and tokens' },
               { title: 'Whitespace', desc: 'Removes double spacing' },
             ].map((step, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 text-center space-y-1">
+              <div key={idx} className={`p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 text-center space-y-1 ${idx === 4 ? 'col-span-2 sm:col-span-1' : ''}`}>
                 <span className="text-xs font-bold text-slate-900 dark:text-white">{step.title}</span>
                 <p className="text-[10px] text-slate-400 dark:text-slate-500 leading-relaxed">{step.desc}</p>
               </div>
@@ -92,7 +92,7 @@ export default function About() {
           <h2 className="font-extrabold text-base">Model Algorithms Explored</h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
             {
               title: 'TF-IDF Vectorization',
@@ -107,7 +107,7 @@ export default function About() {
               desc: 'Baseline models evaluated during benchmarking. Multi-nominal Naive Bayes is suitable for fast text sorting, whereas Random Forests provide ensemble split comparisons.'
             }
           ].map((alg, index) => (
-            <GlassCard key={index} className="flex flex-col h-56 space-y-3 justify-between">
+            <GlassCard key={index} className={`flex flex-col h-56 space-y-3 justify-between ${index === 2 ? 'sm:col-span-2 lg:col-span-1' : ''}`}>
               <h3 className="font-extrabold text-sm text-slate-900 dark:text-white">{alg.title}</h3>
               <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">{alg.desc}</p>
             </GlassCard>

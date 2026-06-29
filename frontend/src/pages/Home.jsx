@@ -106,7 +106,7 @@ export default function Home({ setCurrentPage }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {[
             { step: '01', title: 'Paste Details', desc: 'Copy the job description text and paste it into the analyzer.' },
             { step: '02', title: 'NLP Text Cleansing', desc: 'Our engine strips out noisy URLs, HTML, punctuation, and digits.' },

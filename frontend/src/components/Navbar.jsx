@@ -73,7 +73,7 @@ export default function Navbar({ currentPage, setCurrentPage, theme, toggleTheme
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50/95 dark:bg-dark-900/95 backdrop-blur-lg px-4 py-4 space-y-2 animate-fade-in-up">
+        <div className="absolute top-full left-0 w-full md:hidden border-b border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50/95 dark:bg-dark-900/95 backdrop-blur-lg px-4 py-4 space-y-2 animate-fade-in-up shadow-xl shadow-slate-900/5 dark:shadow-black/40">
           {navLinks.map((link) => (
             <button
               key={link.id}

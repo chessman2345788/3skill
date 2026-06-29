@@ -16,8 +16,6 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [toast, setToast] = useState(null);
-
-  // Sync dark theme class toggle on DOM document element
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {

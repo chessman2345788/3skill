@@ -1,20 +1,17 @@
 import axios from 'axios';
 
-// Resolve environment API URL, fallback to localhost 5000 if not defined
 const BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000, // 10 second timeout threshold
+  timeout: 10000, 
   headers: {
     'Content-Type': 'application/json',
   }
 });
 
 export const apiService = {
-  /**
-   * Queries GET /health status of backend server.
-   */
+ 
   async checkHealth() {
     try {
       const response = await apiClient.get('/health');

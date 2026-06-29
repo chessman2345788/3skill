@@ -104,7 +104,7 @@ export default function ApiStatus({ showToast }) {
         </div>
 
         {/* Status Parameters list */}
-        <div className="grid grid-cols-2 gap-4 max-w-md mx-auto pt-4 border-t border-slate-200/50 dark:border-slate-800/50 text-left">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto pt-4 border-t border-slate-200/50 dark:border-slate-800/50 text-left">
           
           {/* Latency parameters */}
           <div className="p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 space-y-1">
@@ -134,7 +134,7 @@ export default function ApiStatus({ showToast }) {
           </div>
 
           {/* Uptime Host parameters */}
-          <div className="p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 space-y-1 col-span-2">
+          <div className="p-3.5 rounded-xl bg-slate-100/50 dark:bg-slate-800/40 border border-slate-200/50 dark:border-slate-700/50 space-y-1 sm:col-span-2">
             <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider block">Endpoint Host URI</span>
             <span className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 truncate">
               <Server size={12} className="text-indigo-500 flex-shrink-0" />
