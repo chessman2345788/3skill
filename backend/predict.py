@@ -4,10 +4,10 @@ import os
 
 try:
     from backend.config import Config
-    from backend.utils import clean_text
+    from backend.utils import clean_text, extract_red_flags
 except ImportError:
     from config import Config
-    from utils import clean_text
+    from utils import clean_text, extract_red_flags
 
 class ModelAssetLoader:
     """
@@ -36,7 +36,7 @@ class ModelAssetLoader:
 
 def predict_job(job_description):
     """
-    Cleans raw description, vectorizes text, runs inference, and returns prediction details.
+    Cleans raw description, vectorizes text, runs inference, extracts XAI indicators, and returns prediction details.
     """
     start_time = time.perf_counter()
     
@@ -46,7 +46,11 @@ def predict_job(job_description):
             "confidence": 100.0,
             "probability": [1.0, 0.0],
             "risk_level": "Low",
-            "processing_time": "0.0000 sec"
+            "processing_time": "0.0000 sec",
+            "red_flags": [],
+            "contributing_keywords": [],
+            "category_counts": {},
+            "trust_markers": []
         }
         
     # Clean the input text
@@ -82,6 +86,35 @@ def predict_job(job_description):
             risk_level = "Low"
     else:
         risk_level = "Low"
+
+    # Extract Red-Flag Phrases & Trust Markers (Explainable AI)
+    red_flag_data = extract_red_flags(job_description)
+
+    # Extract Top Contributing Tokens from TF-IDF + Logistic Regression Weights
+    contributing_keywords = []
+    try:
+        if hasattr(vectorizer, 'get_feature_names_out') and hasattr(model, 'coef_'):
+            feature_names = vectorizer.get_feature_names_out()
+            coefs = model.coef_[0]
+            nonzeros = vectorized_text.nonzero()[1]
+            
+            token_scores = []
+            for idx in nonzeros:
+                term = feature_names[idx]
+                tfidf_val = vectorized_text[0, idx]
+                weight = coefs[idx]
+                score = tfidf_val * weight
+                token_scores.append({
+                    "term": term,
+                    "score": round(float(score), 4),
+                    "impact": "fake" if score > 0 else "genuine"
+                })
+            
+            # Sort by absolute score impact
+            token_scores.sort(key=lambda x: abs(x["score"]), reverse=True)
+            contributing_keywords = token_scores[:10]
+    except Exception:
+        contributing_keywords = []
         
     end_time = time.perf_counter()
     processing_time = f"{end_time - start_time:.4f} sec"
@@ -91,5 +124,11 @@ def predict_job(job_description):
         "confidence": confidence_percentage,
         "probability": [round(p_genuine, 4), round(p_fake, 4)],
         "risk_level": risk_level,
-        "processing_time": processing_time
+        "processing_time": processing_time,
+        "red_flags": red_flag_data.get("flags", []),
+        "flag_count": red_flag_data.get("flag_count", 0),
+        "category_counts": red_flag_data.get("category_counts", {}),
+        "trust_markers": red_flag_data.get("trust_markers_found", []),
+        "contributing_keywords": contributing_keywords
     }
+

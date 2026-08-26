@@ -8,9 +8,12 @@ This repository contains a complete, production-ready SaaS application with a **
 
 ## Key Features
 - **Instant Inference**: Analyzes job description text features in `<0.05 seconds`.
+- **Explainable AI (XAI)**: In-text red-flag phrase highlighting with categorized risk breakdown (Financial, Bypassed Screening, Communication, Compensation).
+- **Structured Company Audit**: Multi-field verification of recruiter email domains, official website match, and salary anomaly heuristics.
+- **Bulk Batch Job Scanner**: Upload CSV/JSON datasets, filter by risk severity, and export audit reports.
+- **A/B Job Comparator & Scam Radar**: Side-by-side comparative inspection and comprehensive taxonomy of modern recruitment fraud schemes.
 - **Radial Confidence Meter**: Glowing SVG gauge highlighting classification probability scores.
 - **Diagnostics Dashboard**: Automatic and manual pinging of the backend API with latency logging.
-- **Mock Model Builder**: Self-contained script to generate scikit-learn training weights out-of-the-box.
 - **Client Side logs**: Prediction history logger cached inside browser local storage.
 - **Premium Styling**: Sleek glassmorphism style rules with custom dark/light theme switching.
 
@@ -20,15 +23,15 @@ This repository contains a complete, production-ready SaaS application with a **
 
 ```mermaid
 graph TD
-    A[Client User Interface] -->|1. Paste / Upload Text| B(React 19 Frontend)
+    A[Client User Interface] -->|1. Paste / Upload Text / CSV| B(React 19 Frontend)
     B -->|2. HTTP POST Request| C(Flask REST API Server)
-    C -->|3. Clean Text lower, regex URLs, punctuations| D[utils.py Cleaner]
+    C -->|3. Clean Text / Extract Red Flags / Verify Domains| D[utils.py & domain_verifier.py]
     D -->|4. Clean Text String| E[predict.py Inference Engine]
     E -->|5. Load model/vectorizer pickles once| F[(In-Memory Cache)]
-    E -->|6. TF-IDF Vectorization| G[scikit-learn Classifier]
-    G -->|7. Prediction Labels & Probabilities| C
+    E -->|6. TF-IDF Vectorization & Weights Contribution| G[scikit-learn Classifier]
+    G -->|7. Prediction Labels & Probabilities & XAI Signals| C
     C -->|8. JSON Response Payload| B
-    B -->|9. Render gauges, risk status badges| A
+    B -->|9. Render gauges, in-text highlights, tables| A
 ```
 
 ---
@@ -38,10 +41,12 @@ graph TD
 ```text
 fake-job-posting-detection/
 ├── backend/
-│   ├── app.py                  # Flask REST API entry point
+│   ├── app.py                  # Flask REST API entry point (/predict, /predict/structured, /predict/batch)
 │   ├── config.py               # Centralized configuration class
-│   ├── predict.py              # ML inference and model cache logic
-│   ├── utils.py                # NLP text cleansing pipeline
+│   ├── domain_verifier.py      # Recruiter email & company domain validation engine
+│   ├── predict.py              # ML inference, XAI feature attribution, and model cache logic
+│   ├── utils.py                # NLP cleansing & red-flag pattern extractor
+│   ├── test_backend.py         # Automated API & logic unit test suite
 │   ├── model.pkl               # Serialized Logistic Regression weights
 │   ├── vectorizer.pkl          # Serialized TF-IDF feature extractor
 │   ├── train_mock_model.py     # Script to generate pickles on local setup
@@ -49,15 +54,16 @@ fake-job-posting-detection/
 │   └── render.yaml             # Render deployment configuration
 ├── frontend/
 │   ├── src/
-│   │   ├── components/         # Reusable widgets (toggles, meters, toast)
+│   │   ├── components/         # Reusable widgets (toggles, meters, toast, cards)
 │   │   ├── hooks/              # Theme managers
 │   │   ├── layouts/            # Base visual layout frame
-│   │   ├── pages/              # Views (Home, Detector, About, Status)
+│   │   ├── pages/              # Views (Home, Detector, BatchScanner, ScamRadar, About, ApiStatus)
 │   │   ├── services/           # Axios network configurations
 │   │   ├── utils/              # Sample datasets
-│   │   ├── App.jsx             # Shell controller
+│   │   ├── App.jsx             # Shell controller & tab router
 │   │   ├── index.css           # Global Tailwind directives
 │   │   └── main.jsx            # DOM bootstrapper
+
 │   ├── index.html              # HTML shell & Google fonts loader
 │   ├── postcss.config.js       # Styles preprocessing config
 │   ├── tailwind.config.js      # Styling themes and layout rules

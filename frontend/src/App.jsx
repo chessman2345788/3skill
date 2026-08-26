@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Detector from './pages/Detector';
+import BatchScanner from './pages/BatchScanner';
+import ScamRadar from './pages/ScamRadar';
 import About from './pages/About';
 import ApiStatus from './pages/ApiStatus';
 import Toast from './components/Toast';
@@ -69,6 +71,10 @@ export default function App() {
             showToast={showToast}
           />
         );
+      case 'batch':
+        return <BatchScanner showToast={showToast} />;
+      case 'radar':
+        return <ScamRadar showToast={showToast} />;
       case 'about':
         return <About />;
       case 'status':
@@ -77,6 +83,7 @@ export default function App() {
         return <Home setCurrentPage={setCurrentPage} />;
     }
   };
+
 
   return (
     <MainLayout

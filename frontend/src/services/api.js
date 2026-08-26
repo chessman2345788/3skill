@@ -37,6 +37,35 @@ export const apiService = {
   },
 
   /**
+   * Queries POST /predict/structured for multi-field audit.
+   * @param {object} payload - { title, company, website, recruiter_email, salary, job_description }
+   */
+  async predictStructuredJob(payload) {
+    try {
+      const response = await apiClient.post('/predict/structured', payload);
+      return response.data;
+    } catch (err) {
+      throw this.normalizeError(err);
+    }
+  },
+
+  /**
+   * Queries POST /predict/batch for bulk job dataset processing.
+   * @param {Array} jobs - Array of { id, title, company, description }
+   */
+  async predictBatchJobs(jobs) {
+    try {
+      const response = await apiClient.post('/predict/batch', {
+        jobs
+      });
+      return response.data;
+    } catch (err) {
+      throw this.normalizeError(err);
+    }
+  },
+
+
+  /**
    * Standardizes error outputs for front-end toast components.
    */
   normalizeError(err) {

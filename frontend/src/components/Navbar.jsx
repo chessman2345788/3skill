@@ -8,9 +8,12 @@ export default function Navbar({ currentPage, setCurrentPage, theme, toggleTheme
   const navLinks = [
     { id: 'home', label: 'Home' },
     { id: 'detector', label: 'Detector' },
-    { id: 'about', label: 'About' },
+    { id: 'batch', label: 'Batch Scanner' },
+    { id: 'radar', label: 'Scam Radar' },
     { id: 'status', label: 'API Status' },
+    { id: 'about', label: 'About' },
   ];
+
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200/50 dark:border-slate-800/50 bg-slate-50/70 dark:bg-dark-900/70 backdrop-blur-md transition-colors duration-300">

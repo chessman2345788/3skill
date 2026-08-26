@@ -140,11 +140,12 @@ export default function Home({ setCurrentPage }) {
           </p>
           <div className="space-y-3.5">
             {[
-              'Replicates NLP cleaning identical to model training variables.',
-              'Instantaneous analysis with performance metrics logs.',
-              'Light/dark theme support with modern glassmorphism aesthetic.',
+              'Explainable AI (XAI) with real-time in-text red-flag phrase highlighting.',
+              'Structured company, official domain, and recruiter email verification.',
+              'Bulk Batch Job Scanner to audit CSV/JSON datasets with exportable reports.',
+              'Interactive A/B Job Comparator and Modern Scam Taxonomy Radar.',
               'Secure local history log allows tracking of recent scans.',
-              'Clean, modular React architecture following SOLID patterns.'
+              'Light/dark theme support with sleek glassmorphism aesthetic.'
             ].map((feature, index) => (
               <div key={index} className="flex items-start gap-2.5">
                 <CheckCircle2 className="text-emerald-500 dark:text-emerald-400 mt-0.5 flex-shrink-0" size={18} />
@@ -156,20 +157,35 @@ export default function Home({ setCurrentPage }) {
           </div>
         </div>
 
-        <GlassCard className="bg-gradient-to-br from-brand-500/5 to-indigo-500/5 dark:from-brand-500/10 dark:to-indigo-500/10 border-brand-500/10 flex flex-col justify-center items-center py-12 px-8 text-center space-y-4">
-          <HelpCircle size={48} className="text-brand-500 dark:text-brand-400 animate-float" />
-          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Ready to evaluate a post?</h3>
+        <GlassCard className="bg-gradient-to-br from-brand-500/5 to-indigo-500/5 dark:from-brand-500/10 dark:to-indigo-500/10 border-brand-500/10 flex flex-col justify-center items-center py-10 px-8 text-center space-y-4">
+          <HelpCircle size={44} className="text-brand-500 dark:text-brand-400 animate-float" />
+          <h3 className="text-xl font-extrabold text-slate-900 dark:text-white">Explore VeriWork Suite</h3>
           <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 max-w-xs">
-            Try pasting a job outline directly. We provide both scam and genuine samples to test system responses immediately.
+            Choose between single-text explainable analysis, multi-field company verification, or bulk CSV dataset audits.
           </p>
-          <button
-            onClick={() => setCurrentPage('detector')}
-            className="mt-2 px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-sm active:scale-95 transition-all shadow-md shadow-brand-500/15"
-          >
-            Launch Detector Panel
-          </button>
+          <div className="flex flex-wrap justify-center gap-2 pt-2">
+            <button
+              onClick={() => setCurrentPage('detector')}
+              className="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white font-bold text-xs active:scale-95 transition-all shadow-md shadow-brand-500/15"
+            >
+              Detector & XAI
+            </button>
+            <button
+              onClick={() => setCurrentPage('batch')}
+              className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs active:scale-95 transition-all shadow-md"
+            >
+              Batch Scanner
+            </button>
+            <button
+              onClick={() => setCurrentPage('radar')}
+              className="px-4 py-2 rounded-xl bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white font-bold text-xs active:scale-95 transition-all"
+            >
+              Scam Radar
+            </button>
+          </div>
         </GlassCard>
       </div>
     </motion.div>
   );
 }
+

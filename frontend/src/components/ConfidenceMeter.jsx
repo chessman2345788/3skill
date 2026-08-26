@@ -74,5 +74,6 @@ export default function ConfidenceMeter({ percentage, isFake }) {
 
       </div>
     </div>
+
   );
 }
