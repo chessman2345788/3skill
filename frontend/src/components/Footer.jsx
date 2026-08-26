@@ -1,62 +1,66 @@
 import React from 'react';
-import { ShieldCheck, Cpu, Database, Mail } from 'lucide-react';
+import { Shield, Cpu, Database, Terminal, Heart, ArrowUpRight } from 'lucide-react';
 
 export default function Footer({ setCurrentPage }) {
   return (
-    <footer className="border-t border-slate-200/50 dark:border-slate-800/50 bg-slate-50 dark:bg-dark-900 transition-colors duration-300 py-12 mt-auto">
+    <footer className="border-t border-white/[0.08] bg-[#07090e]/90 backdrop-blur-xl py-12 mt-auto relative z-10 font-mono text-xs">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
         
-        {/* Brand */}
+        {/* Brand Column */}
         <div className="space-y-4 md:col-span-2">
-          <div className="flex items-center gap-2">
-            <div className="p-2 rounded-xl bg-brand-500/10 text-brand-500 dark:text-brand-400">
-              <ShieldCheck size={20} />
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+              <Shield size={18} />
             </div>
-            <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300 bg-clip-text text-transparent">
-              Veri<span className="text-brand-500 dark:text-brand-400">Work</span>
+            <span className="font-display font-extrabold text-base tracking-tight text-white">
+              Veri<span className="text-cyan-400">Work</span>
             </span>
           </div>
-          <p className="text-sm text-slate-500 dark:text-slate-400 max-w-sm leading-relaxed">
-            Leveraging natural language processing and machine learning models to analyze job descriptions and detect fraudulent employment scams in real time.
+          <p className="text-xs text-slate-400 font-sans max-w-sm leading-relaxed">
+            High-throughput recruitment fraud intelligence suite powered by Scikit-Learn natural language processing and Explainable AI.
           </p>
+          <div className="flex items-center gap-2 text-[10px] text-slate-500">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>MODEL WEIGHTS LOADED // LATENCY &lt; 0.04S</span>
+          </div>
         </div>
 
-        {/* Navigation */}
+        {/* Platform Links */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">
-            Platform
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            Suite Modules
           </h4>
-          <ul className="space-y-2">
+          <ul className="space-y-2 text-xs font-sans">
             <li>
               <button 
                 onClick={() => setCurrentPage('home')}
-                className="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+                className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
               >
-                Home
+                <span>Platform Overview</span>
               </button>
             </li>
             <li>
               <button 
                 onClick={() => setCurrentPage('detector')}
-                className="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+                className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
               >
-                Detector Panel
+                <span>Neural Detector</span>
               </button>
             </li>
             <li>
               <button 
-                onClick={() => setCurrentPage('about')}
-                className="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+                onClick={() => setCurrentPage('batch')}
+                className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
               >
-                About NLP Pipeline
+                <span>Batch CSV Scanner</span>
               </button>
             </li>
             <li>
               <button 
-                onClick={() => setCurrentPage('status')}
-                className="text-sm text-slate-500 dark:text-slate-400 hover:text-brand-500 dark:hover:text-brand-400 transition-colors"
+                onClick={() => setCurrentPage('radar')}
+                className="text-slate-400 hover:text-cyan-400 transition-colors flex items-center gap-1"
               >
-                API Status Checks
+                <span>Scam Radar & A/B Diff</span>
               </button>
             </li>
           </ul>
@@ -64,22 +68,25 @@ export default function Footer({ setCurrentPage }) {
 
         {/* Technical stack tags */}
         <div className="space-y-3">
-          <h4 className="text-sm font-semibold text-slate-900 dark:text-white uppercase tracking-wider">
-            Model Details
+          <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+            Core Architecture
           </h4>
-          <div className="flex flex-wrap gap-2">
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
-              <Cpu size={12} /> TF-IDF
+          <div className="flex flex-wrap gap-1.5">
+            <span className="px-2 py-1 rounded-md text-[10px] bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+              TF-IDF Vectorizer
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
-              <Database size={12} /> Logistic Regression
+            <span className="px-2 py-1 rounded-md text-[10px] bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+              Logistic Regression
             </span>
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/50 dark:border-slate-700/50">
-              <Mail size={12} /> Regex Preprocessing
+            <span className="px-2 py-1 rounded-md text-[10px] bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+              React 19 + Framer Motion
+            </span>
+            <span className="px-2 py-1 rounded-md text-[10px] bg-white/[0.04] text-slate-300 border border-white/[0.06]">
+              Flask REST API
             </span>
           </div>
-          <div className="pt-4 text-xs text-slate-400 dark:text-slate-500">
-            &copy; {new Date().getFullYear()} VeriWork. Built for safety.
+          <div className="pt-4 text-[10px] text-slate-500">
+            &copy; {new Date().getFullYear()} VeriWork AI. Open security benchmark.
           </div>
         </div>
 

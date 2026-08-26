@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileSpreadsheet, Upload, Download, RefreshCw, AlertTriangle, 
-  ShieldCheck, ShieldAlert, Search, Filter, Sparkles, CheckCircle2, ChevronDown, ChevronUp, Layers
+  ShieldCheck, ShieldAlert, Search, Sparkles, CheckCircle2, 
+  ChevronDown, ChevronUp, Layers, Terminal, ArrowRight
 } from 'lucide-react';
 import GlassCard from '../components/GlassCard';
 import { apiService } from '../services/api';
 
 const SAMPLE_BATCH = [
-  { id: 1, title: 'Senior Software Engineer', company: 'Apex Cloud Systems', description: 'Seeking a Senior Backend Engineer with 4+ years in Python, FastAPI, and PostgreSQL. Benefits include 401(k), health insurance, flexible remote work.' },
+  { id: 1, title: 'Senior Backend Engineer (FastAPI)', company: 'Apex Cloud Systems', description: 'Seeking a Senior Backend Engineer with 4+ years in Python, FastAPI, and PostgreSQL. Benefits include 401(k), health insurance, flexible remote work.' },
   { id: 2, title: 'Cash Assistant / Money Handler', company: 'QuickPay Services', description: 'Urgent hiring! Work from home. Earn $5000 a week processing wire transfers from your personal bank account. No experience needed. Immediate start!' },
   { id: 3, title: 'Product Marketing Manager', company: 'Stripe Partners', description: 'Lead global product marketing initiatives for B2B fintech solutions. Requires Bachelor degree and 5 years SaaS marketing background.' },
   { id: 4, title: 'Online Package Inspector', company: 'Global Logistics Net', description: 'Package handler needed urgently. Receive boxes at your home, check items, and re-ship them. Massive weekly income paid daily in Bitcoin or CashApp.' },
   { id: 5, title: 'Data Entry Clerk', company: 'Unclaimed Asset Dept', description: 'Earn fast cash working 1-2 hours a day. No interview required, immediate start. Guaranteed placement and sign-on bonus.' },
-  { id: 6, title: 'Frontend React Developer', company: 'Innovate UI Labs', description: 'Build glassmorphic web dashboards using React 19 and Tailwind CSS. Full-time position with dental, medical, and paid time off.' }
+  { id: 6, title: 'Frontend React 19 Developer', company: 'Innovate UI Labs', description: 'Build glassmorphic web dashboards using React 19 and Tailwind CSS. Full-time position with dental, medical, and paid time off.' }
 ];
 
 export default function BatchScanner({ showToast }) {
@@ -21,18 +22,22 @@ export default function BatchScanner({ showToast }) {
   const [batchData, setBatchData] = useState([]);
   const [summary, setSummary] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterRisk, setFilterRisk] = useState('ALL'); // 'ALL' | 'FAKE' | 'GENUINE' | 'HIGH'
+  const [filterRisk, setFilterRisk] = useState('ALL');
   const [expandedRow, setExpandedRow] = useState(null);
+  const [isDragOver, setIsDragOver] = useState(false);
 
   const handleLoadSampleBatch = () => {
     runBatchAnalysis(SAMPLE_BATCH);
-    showToast('Loaded and scanned sample 6-job dataset.', 'success');
+    showToast('Loaded and evaluated sample 6-job dataset.', 'success');
   };
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
+    processFile(file);
+  };
 
+  const processFile = (file) => {
     const reader = new FileReader();
     reader.onload = (event) => {
       try {
@@ -74,7 +79,7 @@ export default function BatchScanner({ showToast }) {
         }
 
         runBatchAnalysis(parsedJobs);
-        showToast(`Imported ${parsedJobs.length} jobs. Running batch AI analysis...`, 'info');
+        showToast(`Imported ${parsedJobs.length} jobs. Executing batch analysis...`, 'info');
       } catch (err) {
         showToast('Failed to parse file: ' + err.message, 'error');
       }
@@ -121,7 +126,7 @@ export default function BatchScanner({ showToast }) {
     link.download = `veriwork_batch_audit_${Date.now()}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    showToast('Batch CSV report downloaded.', 'success');
+    showToast('Batch CSV audit report downloaded.', 'success');
   };
 
   // Filtered dataset
@@ -138,37 +143,37 @@ export default function BatchScanner({ showToast }) {
   });
 
   return (
-    <div className="space-y-8 py-6">
+    <div className="space-y-8 py-4 sm:py-6">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
         <div className="space-y-1">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/10 mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400">
             <Layers size={13} />
-            Enterprise Bulk Audit
+            <span>BULK AUDIT TERMINAL</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
             Bulk Batch Job Scanner
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Upload CSV/JSON datasets with dozens of job postings to perform parallel AI risk assessments.
+          <p className="text-xs sm:text-sm text-slate-400">
+            Parallel AI threat vector evaluation for campus recruitment, placement cells, and job portals.
           </p>
         </div>
 
-        {/* Toolbar actions */}
+        {/* Action Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={handleLoadSampleBatch}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-brand-500/10 hover:bg-brand-500/20 text-brand-600 dark:text-brand-400 border border-brand-500/20 transition-all"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-all"
           >
-            <Sparkles size={14} />
-            Load Sample 6-Job Batch
+            <Sparkles size={13} />
+            <span>Load Sample 6-Job Batch</span>
           </button>
 
-          <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-800 dark:bg-slate-700 hover:bg-slate-700 dark:hover:bg-slate-600 text-white cursor-pointer transition-all shadow-sm">
-            <Upload size={14} />
-            Upload CSV / JSON
+          <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white cursor-pointer transition-all">
+            <Upload size={13} />
+            <span>Upload CSV / JSON</span>
             <input
               type="file"
               accept=".csv,.json,.txt"
@@ -180,171 +185,174 @@ export default function BatchScanner({ showToast }) {
           {batchData.length > 0 && (
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-sm"
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-md transition-all"
             >
-              <Download size={14} />
-              Export CSV
+              <Download size={13} />
+              <span>Export CSV</span>
             </button>
           )}
         </div>
       </div>
 
-      {/* Summary KPI Cards if batch is loaded */}
+      {/* Summary KPI Cards */}
       {summary && (
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+          className="grid grid-cols-2 lg:grid-cols-4 gap-4"
         >
-          <GlassCard className="p-4">
-            <span className="text-[11px] uppercase font-bold text-slate-400">Total Processed</span>
-            <div className="text-2xl font-black text-slate-900 dark:text-white mt-1">{batchData.length} Jobs</div>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400">Dataset row volume</span>
+          <GlassCard className="p-4 space-y-1">
+            <span className="text-[10px] font-mono font-bold uppercase text-slate-400">Total Evaluated</span>
+            <div className="text-2xl sm:text-3xl font-mono font-black text-white">{batchData.length}</div>
+            <span className="text-[11px] text-slate-500">Postings processed</span>
           </GlassCard>
 
-          <GlassCard className="p-4 border-red-500/20 bg-red-500/5">
-            <span className="text-[11px] uppercase font-bold text-red-500">Fraud Rate</span>
-            <div className="text-2xl font-black text-red-500 mt-1">{summary.fake_percentage}%</div>
-            <span className="text-[11px] text-red-400">{summary.fake_count} listings flagged</span>
+          <GlassCard className="p-4 space-y-1 border-rose-500/30 bg-rose-500/5">
+            <span className="text-[10px] font-mono font-bold uppercase text-rose-400">Fraud Ratio</span>
+            <div className="text-2xl sm:text-3xl font-mono font-black text-rose-400">{summary.fake_percentage}%</div>
+            <span className="text-[11px] text-rose-400/80">{summary.fake_count} deceptive listings</span>
           </GlassCard>
 
-          <GlassCard className="p-4 border-emerald-500/20 bg-emerald-500/5">
-            <span className="text-[11px] uppercase font-bold text-emerald-500">Genuine Rate</span>
-            <div className="text-2xl font-black text-emerald-500 mt-1">
+          <GlassCard className="p-4 space-y-1 border-emerald-500/30 bg-emerald-500/5">
+            <span className="text-[10px] font-mono font-bold uppercase text-emerald-400">Genuine Ratio</span>
+            <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400">
               {((summary.genuine_count / batchData.length) * 100).toFixed(1)}%
             </div>
-            <span className="text-[11px] text-emerald-400">{summary.genuine_count} listings verified</span>
+            <span className="text-[11px] text-emerald-400/80">{summary.genuine_count} verified authentic</span>
           </GlassCard>
 
-          <GlassCard className="p-4 border-amber-500/20 bg-amber-500/5">
-            <span className="text-[11px] uppercase font-bold text-amber-500">High Risk Alerts</span>
-            <div className="text-2xl font-black text-amber-500 mt-1">{summary.high_risk_count}</div>
-            <span className="text-[11px] text-amber-400">Urgent candidate danger</span>
+          <GlassCard className="p-4 space-y-1 border-amber-500/30 bg-amber-500/5">
+            <span className="text-[10px] font-mono font-bold uppercase text-amber-400">Critical Alerts</span>
+            <div className="text-2xl sm:text-3xl font-mono font-black text-amber-400">{summary.high_risk_count}</div>
+            <span className="text-[11px] text-amber-400/80">High severity score</span>
           </GlassCard>
         </motion.div>
       )}
 
-      {/* Main Table View */}
+      {/* Main Table Interface */}
       {loading ? (
-        <GlassCard className="text-center py-20 space-y-3">
-          <RefreshCw size={36} className="animate-spin text-brand-500 mx-auto" />
-          <h3 className="font-extrabold text-base text-slate-900 dark:text-white">Analyzing Job Batch Dataset...</h3>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
-            Extracting NLP vector features and calculating risk scores across all submissions.
-          </p>
+        <GlassCard className="text-center py-20 space-y-4">
+          <RefreshCw size={36} className="animate-spin text-cyan-400 mx-auto" />
+          <div className="space-y-1 font-mono">
+            <h3 className="text-base font-bold text-white">EXECUTING BATCH VECTOR INFERENCE...</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto font-sans">
+              Parallel evaluation of n-gram weights and semantic risk triggers.
+            </p>
+          </div>
         </GlassCard>
       ) : batchData.length > 0 ? (
-        <GlassCard className="space-y-4 p-5">
-          {/* Filter Bar */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/50 dark:border-slate-800/50 pb-4">
+        <GlassCard className="space-y-4 p-5 sm:p-6">
+          
+          {/* Table Header Filter Bar */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
             <div className="relative flex-1 max-w-md">
-              <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search job title or company..."
-                className="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/30 dark:bg-dark-900/30 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500 text-slate-800 dark:text-slate-100"
+                placeholder="Search by title or company entity..."
+                className="w-full pl-9 pr-4 py-2 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
               />
             </div>
 
             {/* Filter Pills */}
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 font-mono text-[11px]">
               <button
                 onClick={() => setFilterRisk('ALL')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filterRisk === 'ALL' ? 'bg-brand-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  filterRisk === 'ALL' ? 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                All ({batchData.length})
+                ALL ({batchData.length})
               </button>
               <button
                 onClick={() => setFilterRisk('FAKE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filterRisk === 'FAKE' ? 'bg-red-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  filterRisk === 'FAKE' ? 'bg-rose-500/20 text-rose-300 border border-rose-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Fake Only ({summary?.fake_count || 0})
+                FAKE ({summary?.fake_count || 0})
               </button>
               <button
                 onClick={() => setFilterRisk('HIGH')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filterRisk === 'HIGH' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  filterRisk === 'HIGH' ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                High Risk ({summary?.high_risk_count || 0})
+                HIGH RISK ({summary?.high_risk_count || 0})
               </button>
               <button
                 onClick={() => setFilterRisk('GENUINE')}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                  filterRisk === 'GENUINE' ? 'bg-emerald-500 text-white shadow-xs' : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800'
+                className={`px-3 py-1.5 rounded-lg font-bold transition-all ${
+                  filterRisk === 'GENUINE' ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'text-slate-400 hover:text-white'
                 }`}
               >
-                Genuine ({summary?.genuine_count || 0})
+                GENUINE ({summary?.genuine_count || 0})
               </button>
             </div>
           </div>
 
           {/* Table */}
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-slate-200/50 dark:border-slate-800/50 text-slate-400 font-extrabold uppercase tracking-wider text-[10px]">
-                  <th className="pb-3 px-2">#</th>
-                  <th className="pb-3 px-2">Job Title</th>
-                  <th className="pb-3 px-2">Company</th>
-                  <th className="pb-3 px-2">AI Prediction</th>
-                  <th className="pb-3 px-2">Confidence</th>
-                  <th className="pb-3 px-2">Risk Level</th>
-                  <th className="pb-3 px-2 text-right">Action</th>
+                <tr className="border-b border-white/[0.08] text-slate-400 uppercase text-[10px] tracking-wider">
+                  <th className="pb-3 px-3">#</th>
+                  <th className="pb-3 px-3">Job Title</th>
+                  <th className="pb-3 px-3">Company</th>
+                  <th className="pb-3 px-3">Prediction</th>
+                  <th className="pb-3 px-3">Confidence</th>
+                  <th className="pb-3 px-3">Risk Level</th>
+                  <th className="pb-3 px-3 text-right">Details</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/50">
+              <tbody className="divide-y divide-white/[0.06]">
                 {filteredJobs.map((job) => (
                   <React.Fragment key={job.id}>
                     <tr 
                       onClick={() => setExpandedRow(expandedRow === job.id ? null : job.id)}
-                      className="hover:bg-slate-100/50 dark:hover:bg-slate-800/40 cursor-pointer transition-colors"
+                      className="hover:bg-white/[0.03] cursor-pointer transition-colors"
                     >
-                      <td className="py-3 px-2 font-mono text-slate-400">{job.id}</td>
-                      <td className="py-3 px-2 font-bold text-slate-900 dark:text-slate-100">{job.title}</td>
-                      <td className="py-3 px-2 text-slate-600 dark:text-slate-300">{job.company}</td>
-                      <td className="py-3 px-2">
-                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold text-[10px] uppercase ${
+                      <td className="py-3 px-3 text-slate-500">{job.id}</td>
+                      <td className="py-3 px-3 font-bold text-white">{job.title}</td>
+                      <td className="py-3 px-3 text-slate-300">{job.company}</td>
+                      <td className="py-3 px-3">
+                        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                           job.prediction === 'Fake Job'
-                            ? 'bg-red-500/10 text-red-500 border border-red-500/20'
-                            : 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20'
+                            ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                            : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
                         }`}>
                           {job.prediction === 'Fake Job' ? <ShieldAlert size={11} /> : <ShieldCheck size={11} />}
                           {job.prediction}
                         </span>
                       </td>
-                      <td className="py-3 px-2 font-bold text-slate-700 dark:text-slate-300">{job.confidence}%</td>
-                      <td className="py-3 px-2">
-                        <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
-                          job.risk_level === 'High' ? 'bg-red-500/10 text-red-500' : job.risk_level === 'Medium' ? 'bg-amber-500/10 text-amber-500' : 'bg-emerald-500/10 text-emerald-500'
+                      <td className="py-3 px-3 font-bold text-slate-200">{job.confidence}%</td>
+                      <td className="py-3 px-3">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
+                          job.risk_level === 'High' ? 'bg-rose-500/15 text-rose-400' : job.risk_level === 'Medium' ? 'bg-amber-500/15 text-amber-400' : 'bg-emerald-500/15 text-emerald-400'
                         }`}>
                           {job.risk_level}
                         </span>
                       </td>
-                      <td className="py-3 px-2 text-right text-slate-400">
-                        {expandedRow === job.id ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+                      <td className="py-3 px-3 text-right text-slate-500">
+                        {expandedRow === job.id ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                       </td>
                     </tr>
 
                     {/* Expanded Row Detail */}
                     {expandedRow === job.id && (
-                      <tr className="bg-slate-50/70 dark:bg-dark-900/50">
+                      <tr className="bg-black/40">
                         <td colSpan={7} className="p-4">
-                          <div className="p-3 rounded-xl bg-white/60 dark:bg-slate-900/60 border border-slate-200/50 dark:border-slate-800/50 space-y-2">
-                            <div className="flex items-center justify-between text-[11px] font-bold text-slate-500">
-                              <span>Inference Latency: {job.processing_time}</span>
+                          <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-2 font-sans">
+                            <div className="flex items-center justify-between text-xs font-mono text-slate-400">
+                              <span>Latency: {job.processing_time}</span>
                               <span>Red Flag Tokens: {job.flag_count} matched</span>
                             </div>
-                            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                            <p className="text-xs text-slate-300 leading-relaxed">
                               {job.prediction === 'Fake Job' 
-                                ? '⚠️ Fraud Warning: This job posting contains high-risk patterns such as atypical compensation promises, payment handling, or informal interview pathways.' 
-                                : '✅ Verification Pass: This job posting demonstrates authentic corporate hiring language, specific domain qualifications, and structured benefit offerings.'}
+                                ? '⚠️ Threat Assessment: Elevated risk profile detected. Language features exhibit atypical compensation models, urgent placement tactics, or payment redirection.' 
+                                : '✅ Verification Pass: The linguistic profile aligns with legitimate corporate recruitment conventions, structured duties, and standard benefit packages.'}
                             </p>
                           </div>
                         </td>
@@ -357,20 +365,34 @@ export default function BatchScanner({ showToast }) {
           </div>
         </GlassCard>
       ) : (
-        <GlassCard className="text-center py-16 space-y-4 border-dashed border-2 border-slate-200 dark:border-slate-800">
-          <FileSpreadsheet size={48} className="text-slate-300 dark:text-slate-700 mx-auto" />
+        /* Empty Dropzone Card */
+        <GlassCard 
+          onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+          onDragLeave={() => setIsDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setIsDragOver(false);
+            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+              processFile(e.dataTransfer.files[0]);
+            }
+          }}
+          className={`text-center py-16 space-y-4 border-dashed border-2 transition-all ${
+            isDragOver ? 'border-cyan-400 bg-cyan-500/10' : 'border-white/[0.1]'
+          }`}
+        >
+          <FileSpreadsheet size={44} className="text-slate-600 mx-auto" />
           <div className="space-y-1">
-            <h3 className="font-extrabold text-base text-slate-800 dark:text-slate-200">No Dataset Uploaded Yet</h3>
-            <p className="text-xs text-slate-400 dark:text-slate-500 max-w-sm mx-auto">
-              Upload a .CSV, .JSON file or click "Load Sample 6-Job Batch" to run an automated high-throughput audit.
+            <h3 className="font-extrabold text-base text-white">No Dataset Uploaded</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              Drag and drop a .CSV, .JSON file here, or test immediately with our pre-loaded batch dataset.
             </p>
           </div>
           <button
             onClick={handleLoadSampleBatch}
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold bg-brand-500 hover:bg-brand-600 text-white shadow-md transition-all"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 transition-all"
           >
-            <Sparkles size={14} />
-            Test with Sample Batch
+            <Sparkles size={13} />
+            <span>Load Sample 6-Job Dataset</span>
           </button>
         </GlassCard>
       )}

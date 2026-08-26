@@ -7,7 +7,20 @@ export default {
   darkMode: "class",
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['Plus Jakarta Sans', 'Outfit', 'sans-serif'],
+        mono: ['JetBrains Mono', 'monospace'],
+      },
       colors: {
+        obsidian: {
+          950: '#05070a',
+          900: '#07090e',
+          850: '#0b0f17',
+          800: '#101725',
+          700: '#172033',
+          600: '#222f49',
+        },
         brand: {
           50: '#f0f9ff',
           100: '#e0f2fe',
@@ -21,6 +34,11 @@ export default {
           900: '#0c4a6e',
           950: '#082f49',
         },
+        cyan: {
+          400: '#22d3ee',
+          500: '#06b6d4',
+          electric: '#00f2fe',
+        },
         dark: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -30,16 +48,19 @@ export default {
           500: '#64748b',
           600: '#475569',
           700: '#334155',
-          800: '#1e293b', // Rich slate card backgrounds
-          900: '#0f172a', // Dark mode backdrop
-          950: '#020617', // Darker canvas accent
+          800: '#1e293b',
+          900: '#0f172a',
+          950: '#020617',
         }
       },
       animation: {
         'fade-in-up': 'fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
         'fade-in': 'fadeIn 0.4s ease-out forwards',
-        'float': 'float 5s ease-in-out infinite',
+        'float': 'float 6s ease-in-out infinite',
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'scan': 'scan 3s linear infinite',
+        'beam': 'beam 8s ease-in-out infinite',
+        'radar': 'radar 3s ease-out infinite',
       },
       keyframes: {
         fadeInUp: {
@@ -53,6 +74,14 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-8px)' },
+        },
+        scan: {
+          '0%': { transform: 'translateY(-100%)' },
+          '100%': { transform: 'translateY(1000%)' },
+        },
+        radar: {
+          '0%': { transform: 'scale(0.8)', opacity: '0.8' },
+          '100%': { transform: 'scale(2.2)', opacity: '0' },
         }
       },
       backdropBlur: {
@@ -60,8 +89,10 @@ export default {
         md: '12px',
         lg: '16px',
         xl: '24px',
+        '2xl': '40px',
       }
     },
   },
   plugins: [],
 }
+

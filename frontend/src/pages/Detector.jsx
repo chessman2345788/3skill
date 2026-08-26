@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Upload, Copy, Download, Trash2, ShieldAlert, ShieldCheck, Clock, 
   RefreshCw, ClipboardList, Sparkles, AlertTriangle, CheckCircle2, 
-  Building2, Globe, Mail, DollarSign, FileText, Eye, Edit3, Info, ChevronRight
+  Building2, Globe, Mail, DollarSign, FileText, Eye, Edit3, Info, 
+  ChevronRight, Terminal, Activity, ArrowRight, Zap, Play
 } from 'lucide-react';
 import GlassCard from '../components/GlassCard';
 import ConfidenceMeter from '../components/ConfidenceMeter';
@@ -15,6 +16,7 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
   const [activeTab, setActiveTab] = useState('quick'); // 'quick' | 'structured'
   const [viewMode, setViewMode] = useState('input'); // 'input' | 'highlight'
   const [loading, setLoading] = useState(false);
+  const [analysisStage, setAnalysisStage] = useState(0);
   const [result, setResult] = useState(null);
 
   // Quick form
@@ -98,6 +100,7 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
     showToast('Cleared input fields.', 'info');
   };
 
+  // Run quick scan with simulated pipeline telemetry stages
   const onSubmitQuick = async (data) => {
     const textTrimmed = data.job_description.trim();
     if (!textTrimmed) {
@@ -107,9 +110,16 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
 
     setLoading(true);
     setResult(null);
+    setAnalysisStage(1);
+
+    const s1 = setTimeout(() => setAnalysisStage(2), 200);
+    const s2 = setTimeout(() => setAnalysisStage(3), 450);
 
     try {
       const res = await apiService.predictJob(textTrimmed);
+      clearTimeout(s1);
+      clearTimeout(s2);
+      setAnalysisStage(4);
       setResult(res);
       addHistoryItem({
         snippet: textTrimmed.length > 55 ? textTrimmed.substring(0, 55) + '...' : textTrimmed,
@@ -123,9 +133,11 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
       showToast(err.message || 'Server error occurred during prediction.', 'error');
     } finally {
       setLoading(false);
+      setAnalysisStage(0);
     }
   };
 
+  // Run structured scan
   const onSubmitStructured = async (data) => {
     const textTrimmed = data.job_description.trim();
     if (!textTrimmed) {
@@ -221,18 +233,17 @@ Verified using Machine Learning & Explainable AI.`;
   // Render Highlighted Text with Red Flags
   const renderHighlightedText = (text, flags) => {
     if (!flags || flags.length === 0) {
-      return <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">{text}</p>;
+      return <p className="whitespace-pre-wrap text-slate-300 font-mono text-xs leading-relaxed">{text}</p>;
     }
 
-    // Build regex pattern for all phrases
     const escapedPhrases = flags.map(f => f.phrase.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).filter(Boolean);
-    if (escapedPhrases.length === 0) return <p className="whitespace-pre-wrap text-slate-700 dark:text-slate-300">{text}</p>;
+    if (escapedPhrases.length === 0) return <p className="whitespace-pre-wrap text-slate-300 font-mono text-xs leading-relaxed">{text}</p>;
 
     const regex = new RegExp(`(${escapedPhrases.join('|')})`, 'gi');
     const parts = text.split(regex);
 
     return (
-      <div className="whitespace-pre-wrap leading-relaxed text-sm text-slate-700 dark:text-slate-300">
+      <div className="whitespace-pre-wrap leading-relaxed text-xs font-mono text-slate-300">
         {parts.map((part, i) => {
           const matchFlag = flags.find(f => f.phrase.toLowerCase() === part.toLowerCase());
           if (matchFlag) {
@@ -242,8 +253,8 @@ Verified using Machine Learning & Explainable AI.`;
                 key={i}
                 className={`inline-block px-1.5 py-0.5 mx-0.5 rounded font-bold transition-transform hover:scale-105 cursor-help ${
                   isHigh 
-                    ? 'bg-red-500/20 text-red-700 dark:text-red-300 border-b-2 border-red-500' 
-                    : 'bg-amber-500/20 text-amber-700 dark:text-amber-300 border-b-2 border-amber-500'
+                    ? 'bg-rose-500/25 text-rose-300 border border-rose-500/40' 
+                    : 'bg-amber-500/25 text-amber-300 border border-amber-500/40'
                 }`}
                 title={`[${matchFlag.category}] ${matchFlag.explanation}`}
               >
@@ -258,107 +269,111 @@ Verified using Machine Learning & Explainable AI.`;
   };
 
   return (
-    <div className="space-y-10 py-6">
+    <div className="space-y-8 py-4 sm:py-6">
       
-      {/* Page Header with Mode Selector */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      {/* Header with Mode Switcher */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/[0.08] pb-5">
         <div className="space-y-1">
-          <h1 className="text-3xl font-extrabold tracking-tight text-slate-900 dark:text-white">
-            AI Detector & Explainability Suite
+          <div className="inline-flex items-center gap-1.5 text-xs font-mono font-bold text-cyan-400">
+            <Terminal size={13} />
+            <span>NEURAL AUDIT ENGINE // V2.4</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+            Job Authenticity Detector
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            Natural Language Processing, in-text red flag detection, and domain verification.
+          <p className="text-xs sm:text-sm text-slate-400">
+            Natural language processing, explainable n-gram attribution, and recruiter DNS inspection.
           </p>
         </div>
 
         {/* Tab switcher */}
-        <div className="inline-flex p-1 rounded-xl bg-slate-200/70 dark:bg-slate-800/70 backdrop-blur-sm self-start sm:self-auto">
+        <div className="inline-flex p-1 rounded-xl bg-white/[0.04] border border-white/[0.08] backdrop-blur-xl self-start sm:self-auto">
           <button
             type="button"
             onClick={() => { setActiveTab('quick'); setResult(null); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'quick'
-                ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-xs'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Sparkles size={14} />
-            Quick Text Scan
+            <Sparkles size={13} />
+            <span>Quick Text Stream</span>
           </button>
           <button
             type="button"
             onClick={() => { setActiveTab('structured'); setResult(null); }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
               activeTab === 'structured'
-                ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-sm'
-                : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-xs'
+                : 'text-slate-400 hover:text-white'
             }`}
           >
-            <Building2 size={14} />
-            Structured Company Audit
+            <Building2 size={13} />
+            <span>Enterprise Entity Audit</span>
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
         
-        {/* Left Column: Input Form & Visualizer */}
-        <GlassCard className="lg:col-span-2 space-y-6">
+        {/* Left Form / Visualizer Column */}
+        <GlassCard className="lg:col-span-2 space-y-5 p-5 sm:p-7">
           
           {/* Quick Toolbar */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200/50 dark:border-slate-800/50 pb-4">
+          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={() => handlePasteSample('genuine')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/10 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-all"
               >
                 <Sparkles size={12} />
-                Paste Genuine Job
+                <span>Paste Genuine Sample</span>
               </button>
               <button
                 type="button"
                 onClick={() => handlePasteSample('fake')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-red-500/10 hover:bg-red-500/20 text-red-600 dark:text-red-400 border border-red-500/10 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all"
               >
                 <Sparkles size={12} />
-                Paste Fake Job
+                <span>Paste Wire Scam Sample</span>
               </button>
             </div>
 
             <div className="flex items-center gap-2">
               {result && result.red_flags && result.red_flags.length > 0 && (
-                <div className="inline-flex p-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200/50 dark:border-slate-700/50">
+                <div className="inline-flex p-0.5 rounded-lg bg-white/[0.04] border border-white/[0.08]">
                   <button
                     type="button"
                     onClick={() => setViewMode('input')}
                     className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
                       viewMode === 'input'
-                        ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                        ? 'bg-cyan-500/20 text-cyan-300'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <Edit3 size={12} />
-                    Edit
+                    <Edit3 size={11} />
+                    <span>Raw Input</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode('highlight')}
                     className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
                       viewMode === 'highlight'
-                        ? 'bg-white dark:bg-slate-900 text-brand-600 dark:text-brand-400 shadow-xs'
-                        : 'text-slate-500 hover:text-slate-800 dark:text-slate-400'
+                        ? 'bg-cyan-500/20 text-cyan-300'
+                        : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <Eye size={12} />
-                    XAI Highlights ({result.red_flags.length})
+                    <Eye size={11} />
+                    <span>XAI Highlights ({result.red_flags.length})</span>
                   </button>
                 </div>
               )}
 
-              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50 cursor-pointer transition-colors">
+              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 cursor-pointer transition-all">
                 <Upload size={12} />
-                Upload TXT
+                <span>Upload TXT</span>
                 <input
                   type="file"
                   accept=".txt"
@@ -370,19 +385,19 @@ Verified using Machine Learning & Explainable AI.`;
               <button
                 type="button"
                 onClick={handleClear}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-slate-400 hover:text-rose-400 transition-colors"
+                title="Clear All Inputs"
               >
-                <Trash2 size={12} />
-                Clear
+                <Trash2 size={13} />
               </button>
             </div>
           </div>
 
-          {/* Quick Scan Mode Form */}
+          {/* Quick Scan Form */}
           {activeTab === 'quick' ? (
             <form onSubmit={handleSubmitQuick(onSubmitQuick)} className="space-y-4">
               {viewMode === 'highlight' && result && result.red_flags ? (
-                <div className="w-full h-64 sm:h-80 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/40 dark:bg-dark-900/40 overflow-y-auto">
+                <div className="w-full h-64 sm:h-80 p-4 rounded-xl border border-white/[0.08] bg-black/40 overflow-y-auto">
                   {renderHighlightedText(jobDescriptionQuick, result.red_flags)}
                 </div>
               ) : (
@@ -390,11 +405,32 @@ Verified using Machine Learning & Explainable AI.`;
                   <textarea
                     {...registerQuick('job_description')}
                     placeholder="Paste the job posting description here (e.g. Roles, Responsibilities, Requirements)..."
-                    className="w-full h-64 sm:h-80 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/25 focus:border-brand-500 dark:focus:border-brand-400 transition-all font-sans resize-none leading-relaxed text-slate-800 dark:text-slate-100"
+                    className="w-full h-64 sm:h-80 p-4 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 focus:border-cyan-500/40 resize-none leading-relaxed transition-all"
                     maxLength={maxLimit}
                   />
-                  <div className={`absolute bottom-3 right-4 text-[10px] font-bold tracking-wider ${charCount >= maxLimit ? 'text-red-500' : 'text-slate-400'}`}>
-                    {charCount.toLocaleString()} / {maxLimit.toLocaleString()} chars
+                  <div className={`absolute bottom-3 right-4 text-[10px] font-mono font-bold tracking-wider ${charCount >= maxLimit ? 'text-rose-400' : 'text-slate-500'}`}>
+                    {charCount.toLocaleString()} / {maxLimit.toLocaleString()} CHARS
+                  </div>
+                </div>
+              )}
+
+              {/* Analysis Pipeline Progress Ticker if loading */}
+              {loading && (
+                <div className="p-3.5 rounded-xl bg-cyan-500/10 border border-cyan-500/20 space-y-2">
+                  <div className="flex items-center justify-between text-xs font-mono font-bold text-cyan-300">
+                    <span className="flex items-center gap-2">
+                      <Activity size={14} className="animate-spin" />
+                      <span>ANALYZING TEXT VECTOR STREAM</span>
+                    </span>
+                    <span>STAGE {analysisStage}/4</span>
+                  </div>
+                  <div className="w-full h-1 rounded-full bg-slate-800 overflow-hidden">
+                    <motion.div 
+                      className="h-full bg-gradient-to-r from-cyan-400 to-blue-500"
+                      initial={{ width: '0%' }}
+                      animate={{ width: `${analysisStage * 25}%` }}
+                      transition={{ duration: 0.3 }}
+                    />
                   </div>
                 </div>
               )}
@@ -402,16 +438,19 @@ Verified using Machine Learning & Explainable AI.`;
               <button
                 type="submit"
                 disabled={loading || !jobDescriptionQuick.trim()}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-500 text-white font-bold text-sm shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-98 transition-all"
                 id="btn-analyze"
               >
                 {loading ? (
                   <>
-                    <RefreshCw size={15} className="animate-spin" />
-                    Analyzing Text & Explainability Signals...
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Executing Bayesian Vector Analysis...</span>
                   </>
                 ) : (
-                  'Run AI Text & XAI Analysis'
+                  <>
+                    <Sparkles size={14} />
+                    <span>Run Neural & Explainability Scan</span>
+                  </>
                 )}
               </button>
             </form>
@@ -420,158 +459,157 @@ Verified using Machine Learning & Explainable AI.`;
             <form onSubmit={handleSubmitStruct(onSubmitStructured)} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    <FileText size={13} className="text-brand-500" />
-                    Job Title
+                  <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                    <FileText size={12} className="text-cyan-400" />
+                    <span>Job Title</span>
                   </label>
                   <input
                     {...registerStruct('title')}
                     type="text"
                     placeholder="e.g. Senior Data Analyst"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 text-slate-800 dark:text-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                   />
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    <Building2 size={13} className="text-brand-500" />
-                    Company Name
+                  <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                    <Building2 size={12} className="text-cyan-400" />
+                    <span>Company Entity</span>
                   </label>
                   <input
                     {...registerStruct('company')}
                     type="text"
                     placeholder="e.g. Microsoft Corporation"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 text-slate-800 dark:text-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                   />
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    <Globe size={13} className="text-brand-500" />
-                    Company Official Website
+                  <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                    <Globe size={12} className="text-cyan-400" />
+                    <span>Official Domain URL</span>
                   </label>
                   <input
                     {...registerStruct('website')}
                     type="text"
                     placeholder="e.g. https://microsoft.com"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 text-slate-800 dark:text-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                   />
                 </div>
 
                 <div>
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    <Mail size={13} className="text-brand-500" />
-                    Recruiter Email Address
+                  <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                    <Mail size={12} className="text-cyan-400" />
+                    <span>Recruiter Contact Email</span>
                   </label>
                   <input
                     {...registerStruct('recruiter_email')}
                     type="text"
                     placeholder="e.g. recruiter@microsoft.com or gmail"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 text-slate-800 dark:text-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                    <DollarSign size={13} className="text-brand-500" />
-                    Offered Salary / Compensation
+                  <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                    <DollarSign size={12} className="text-cyan-400" />
+                    <span>Stated Compensation / Hourly</span>
                   </label>
                   <input
                     {...registerStruct('salary')}
                     type="text"
                     placeholder="e.g. $4,500/week or $120,000/yr"
-                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 text-slate-800 dark:text-slate-100"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-slate-300 mb-1">
-                  <FileText size={13} className="text-brand-500" />
-                  Full Job Description Body *
+                <label className="flex items-center gap-1.5 text-xs font-mono font-bold text-slate-300 mb-1">
+                  <FileText size={12} className="text-cyan-400" />
+                  <span>Job Posting Description Text *</span>
                 </label>
-                <div className="relative">
-                  <textarea
-                    {...registerStruct('job_description')}
-                    placeholder="Paste the job description details, qualifications, and benefits..."
-                    className="w-full h-44 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/20 dark:bg-dark-900/20 text-xs focus:outline-none focus:ring-2 focus:ring-brand-500/25 focus:border-brand-500 text-slate-800 dark:text-slate-100 resize-none leading-relaxed"
-                    maxLength={maxLimit}
-                  />
-                </div>
+                <textarea
+                  {...registerStruct('job_description')}
+                  placeholder="Paste the complete job description details, qualifications, and role requirements..."
+                  className="w-full h-44 p-3.5 rounded-xl border border-white/[0.08] bg-black/35 text-xs font-mono text-slate-200 focus:outline-none focus:ring-2 focus:ring-cyan-500/30 resize-none leading-relaxed"
+                  maxLength={maxLimit}
+                />
               </div>
 
               <button
                 type="submit"
                 disabled={loading || !jobDescriptionStruct.trim()}
-                className="w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-brand-500 hover:bg-brand-600 dark:bg-brand-600 dark:hover:bg-brand-500 text-white font-bold text-sm shadow-md disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition-all"
               >
                 {loading ? (
                   <>
-                    <RefreshCw size={15} className="animate-spin" />
-                    Executing Structured Entity & Domain Audit...
+                    <RefreshCw size={14} className="animate-spin" />
+                    <span>Executing Recruiter DNS & Salary Audit...</span>
                   </>
                 ) : (
-                  'Run Complete Structured Job Audit'
+                  <>
+                    <Building2 size={14} />
+                    <span>Run Complete Structured Entity Audit</span>
+                  </>
                 )}
               </button>
             </form>
           )}
 
-          {/* Explainable Signals & Red Flags Section if Result is available */}
+          {/* Explainable Signals & Red Flags Section */}
           {result && result.red_flags && result.red_flags.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="border-t border-slate-200/50 dark:border-slate-800/50 pt-6 space-y-4"
+              className="border-t border-white/[0.08] pt-5 space-y-4"
             >
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="text-red-500" size={18} />
-                  <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                    Explainable AI Signals ({result.red_flags.length} Red Flags Detected)
-                  </h4>
+                <div className="flex items-center gap-2 text-rose-400 font-mono text-xs font-bold">
+                  <AlertTriangle size={15} />
+                  <span>EXPLAINABLE THREAT ATTRIBUTIONS ({result.red_flags.length} TRIGGERS)</span>
                 </div>
-                <span className="text-[11px] font-bold text-slate-400">Click highlights above to inspect</span>
+                <span className="text-[10px] text-slate-400 font-mono">Click highlights to inspect</span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {result.red_flags.map((flag, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl bg-red-500/5 dark:bg-red-950/20 border border-red-500/20 space-y-1.5 text-left"
+                    className="p-3.5 rounded-xl bg-rose-500/[0.06] border border-rose-500/25 space-y-1.5 text-left"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-red-500/15 text-red-600 dark:text-red-400">
+                      <span className="px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider bg-rose-500/20 text-rose-300">
                         {flag.category}
                       </span>
-                      <span className="text-[10px] font-extrabold text-red-500 uppercase">
-                        {flag.severity} Risk
+                      <span className="text-[10px] font-mono font-extrabold text-rose-400 uppercase">
+                        {flag.severity} RISK
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-slate-900 dark:text-slate-100">
+                    <div className="text-xs font-mono font-bold text-white">
                       "{flag.phrase}"
                     </div>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                    <p className="text-[11px] text-slate-400 leading-snug">
                       {flag.explanation}
                     </p>
                   </div>
                 ))}
               </div>
 
-              {/* Contributing Keywords Impact */}
+              {/* High-Weight Trigger Tokens */}
               {result.contributing_keywords && result.contributing_keywords.length > 0 && (
                 <div className="pt-2 space-y-2">
-                  <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
-                    High-Weight NLP Trigger Words:
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-400">
+                    High-Weight NLP Trigger Tokens:
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {result.contributing_keywords.map((kw, i) => (
                       <span
                         key={i}
-                        className={`px-2 py-1 rounded-md text-[11px] font-bold ${
+                        className={`px-2 py-1 rounded-md text-[10px] font-mono font-bold ${
                           kw.impact === 'fake'
-                            ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
-                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-rose-500/10 text-rose-400 border border-rose-500/20'
+                            : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
                         }`}
                       >
                         {kw.term} ({kw.score > 0 ? `+${kw.score}` : kw.score})
@@ -583,35 +621,33 @@ Verified using Machine Learning & Explainable AI.`;
             </motion.div>
           )}
 
-          {/* Structured Domain Findings if available */}
+          {/* Structured Domain Findings */}
           {result && result.structured_findings && result.structured_findings.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="border-t border-slate-200/50 dark:border-slate-800/50 pt-6 space-y-3"
+              className="border-t border-white/[0.08] pt-5 space-y-3"
             >
-              <div className="flex items-center gap-2">
-                <Building2 className="text-brand-500" size={18} />
-                <h4 className="font-extrabold text-sm text-slate-900 dark:text-white">
-                  Company & Recruiter Verification Findings
-                </h4>
+              <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold">
+                <Building2 size={15} />
+                <span>RECRUITER DOMAIN & ENTITY FINDINGS</span>
               </div>
               <div className="space-y-2">
                 {result.structured_findings.map((f, idx) => (
                   <div
                     key={idx}
-                    className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 flex items-start gap-3"
+                    className="p-3.5 rounded-xl bg-white/[0.03] border border-white/[0.08] flex items-start gap-3"
                   >
-                    <div className={`p-1.5 rounded-lg mt-0.5 ${f.severity === 'High' ? 'bg-red-500/10 text-red-500' : 'bg-amber-500/10 text-amber-500'}`}>
-                      <Info size={16} />
+                    <div className={`p-1.5 rounded-lg mt-0.5 ${f.severity === 'High' ? 'bg-rose-500/10 text-rose-400' : 'bg-amber-500/10 text-amber-400'}`}>
+                      <Info size={15} />
                     </div>
-                    <div className="space-y-0.5 text-left flex-1">
+                    <div className="space-y-0.5 text-left flex-1 font-mono text-xs">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-800 dark:text-slate-200">{f.field}</span>
-                        <span className={`text-[10px] font-black uppercase ${f.severity === 'High' ? 'text-red-500' : 'text-amber-500'}`}>{f.severity}</span>
+                        <span className="font-bold text-white">{f.field}</span>
+                        <span className={`text-[10px] font-extrabold uppercase ${f.severity === 'High' ? 'text-rose-400' : 'text-amber-400'}`}>{f.severity}</span>
                       </div>
-                      <p className="text-xs text-slate-600 dark:text-slate-300">{f.issue}</p>
-                      <p className="text-[11px] text-slate-400 dark:text-slate-500 italic">💡 {f.recommendation}</p>
+                      <p className="text-slate-300 font-sans text-xs">{f.issue}</p>
+                      <p className="text-[11px] text-slate-400 italic">💡 {f.recommendation}</p>
                     </div>
                   </div>
                 ))}
@@ -619,23 +655,9 @@ Verified using Machine Learning & Explainable AI.`;
             </motion.div>
           )}
 
-          {/* Trust Markers if Genuine */}
-          {result && result.trust_markers && result.trust_markers.length > 0 && (
-            <div className="border-t border-slate-200/50 dark:border-slate-800/50 pt-4 flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
-                <CheckCircle2 size={14} /> Trust Markers Found:
-              </span>
-              {result.trust_markers.map((tm, i) => (
-                <span key={i} className="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  {tm}
-                </span>
-              ))}
-            </div>
-          )}
-
         </GlassCard>
 
-        {/* Right Column: Results & History Sidebar */}
+        {/* Right Telemetry & History Column */}
         <div className="space-y-6">
           <AnimatePresence mode="wait">
             {result ? (
@@ -645,142 +667,125 @@ Verified using Machine Learning & Explainable AI.`;
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
               >
-                <GlassCard className={`border-2 ${result.prediction === 'Fake Job' ? 'border-red-500/20 dark:border-red-400/20 bg-red-50/5 dark:bg-red-950/5' : 'border-emerald-500/20 dark:border-emerald-400/20 bg-emerald-50/5 dark:bg-emerald-950/5'}`}>
+                <GlassCard className={`p-6 space-y-4 border ${
+                  result.prediction === 'Fake Job'
+                    ? 'border-rose-500/30 bg-gradient-to-b from-rose-500/10 to-[#0b0f17]'
+                    : 'border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[#0b0f17]'
+                }`}>
                   
-                  {/* Header Badge */}
-                  <div className="flex items-center gap-3 border-b border-slate-200/50 dark:border-slate-800/50 pb-4">
-                    {result.prediction === 'Fake Job' ? (
-                      <div className="p-2.5 rounded-xl bg-red-500/10 text-red-500">
-                        <ShieldAlert size={20} />
-                      </div>
-                    ) : (
-                      <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-500">
-                        <ShieldCheck size={20} />
-                      </div>
-                    )}
+                  {/* Verdict Badge */}
+                  <div className="flex items-center gap-3 border-b border-white/[0.08] pb-4">
+                    <div className={`p-2.5 rounded-xl ${result.prediction === 'Fake Job' ? 'bg-rose-500/15 text-rose-400 border border-rose-500/30' : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'}`}>
+                      {result.prediction === 'Fake Job' ? <ShieldAlert size={22} /> : <ShieldCheck size={22} />}
+                    </div>
                     <div>
-                      <h3 className={`text-lg font-black ${result.prediction === 'Fake Job' ? 'text-red-500' : 'text-emerald-500'}`}>
+                      <h3 className={`text-xl font-mono font-black ${result.prediction === 'Fake Job' ? 'text-rose-400' : 'text-emerald-400'}`}>
                         {result.prediction}
                       </h3>
-                      <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">
-                        Verification Output
+                      <p className="text-[10px] font-mono text-slate-400 uppercase tracking-widest font-bold">
+                        VERDICT ASSESSMENT
                       </p>
                     </div>
                   </div>
 
-                  {/* Confidence Meter */}
+                  {/* Concentric HUD Confidence Meter */}
                   <ConfidenceMeter percentage={result.confidence} isFake={result.prediction === 'Fake Job'} />
 
-                  {/* Prediction Statistics */}
-                  <div className="space-y-3.5 border-t border-slate-200/50 dark:border-slate-800/50 pt-4">
+                  {/* Telemetry Metrics */}
+                  <div className="space-y-3 border-t border-white/[0.08] pt-4 font-mono text-xs">
                     
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400 dark:text-slate-500 font-bold">Risk Assessment</span>
-                      <span className={`px-2.5 py-0.5 rounded-lg text-xs font-black uppercase ${
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Risk Assessment:</span>
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black uppercase ${
                         result.risk_level === 'High' 
-                          ? 'bg-red-500/10 text-red-500'
-                          : result.risk_level === 'Medium'
-                          ? 'bg-amber-500/10 text-amber-500'
-                          : 'bg-emerald-500/10 text-emerald-500'
+                          ? 'bg-rose-500/15 text-rose-400' 
+                          : result.risk_level === 'Medium' 
+                          ? 'bg-amber-500/15 text-amber-400' 
+                          : 'bg-emerald-500/15 text-emerald-400'
                       }`}>
                         {result.risk_level}
                       </span>
                     </div>
 
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-slate-400 dark:text-slate-500 font-bold">Inference Latency</span>
-                      <span className="flex items-center gap-1 font-semibold text-slate-700 dark:text-slate-300">
-                        <Clock size={12} />
-                        {result.processing_time}
-                      </span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-slate-400">Inference Latency:</span>
+                      <span className="text-slate-200 font-bold">{result.processing_time}</span>
                     </div>
 
                     {result.red_flags && (
-                      <div className="flex items-center justify-between text-sm">
-                        <span className="text-slate-400 dark:text-slate-500 font-bold">Scam Signals</span>
-                        <span className="font-bold text-red-500 text-xs">
-                          {result.red_flags.length} Flagged Snippets
-                        </span>
+                      <div className="flex items-center justify-between">
+                        <span className="text-slate-400">Scam Vector Flags:</span>
+                        <span className="text-rose-400 font-bold">{result.red_flags.length} Triggers</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Actions copy/download */}
-                  <div className="flex flex-col sm:flex-row gap-2.5 mt-5 border-t border-slate-200/50 dark:border-slate-800/50 pt-4">
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-2 border-t border-white/[0.08]">
                     <button
                       onClick={handleCopy}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50 transition-colors"
-                      type="button"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 transition-all"
                     >
                       <Copy size={13} />
-                      Copy Report
+                      <span>Copy</span>
                     </button>
                     <button
                       onClick={handleDownload}
-                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 border border-slate-200/50 dark:border-slate-700/50 transition-colors"
-                      type="button"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 transition-all"
                     >
                       <Download size={13} />
-                      Download Audit
+                      <span>Download</span>
                     </button>
                   </div>
 
                 </GlassCard>
               </motion.div>
             ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <GlassCard className="text-center py-10 flex flex-col items-center justify-center border-dashed border-2 border-slate-200 dark:border-slate-800/80">
-                  <ShieldCheck size={36} className="text-slate-300 dark:text-slate-700 mb-3" />
-                  <h4 className="font-extrabold text-slate-800 dark:text-slate-200 text-sm">Awaiting Input Scan</h4>
-                  <p className="text-xs text-slate-400 dark:text-slate-500 max-w-xs mt-1 leading-relaxed">
-                    Paste a job description or provide company details to trigger ML + XAI verification.
-                  </p>
-                </GlassCard>
-              </motion.div>
+              <GlassCard className="text-center py-12 flex flex-col items-center justify-center border-dashed border border-white/[0.08]">
+                <ShieldCheck size={36} className="text-slate-600 mb-3" />
+                <h4 className="font-mono font-bold text-white text-xs uppercase tracking-wider">Awaiting Vector Stream</h4>
+                <p className="text-xs text-slate-500 max-w-xs mt-1 leading-relaxed">
+                  Submit a job description to trigger real-time ML + XAI verification.
+                </p>
+              </GlassCard>
             )}
           </AnimatePresence>
 
           {/* History Panel */}
-          <GlassCard className="space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-200/50 dark:border-slate-800/50 pb-3">
-              <div className="flex items-center gap-1.5 font-extrabold text-sm text-slate-900 dark:text-white">
-                <ClipboardList size={16} className="text-brand-500" />
-                Recent Queries
-              </div>
+          <GlassCard className="space-y-3 p-5">
+            <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 text-xs font-mono">
+              <span className="font-bold text-white flex items-center gap-1.5">
+                <ClipboardList size={14} className="text-cyan-400" />
+                Audit Logs
+              </span>
               {history.length > 0 && (
                 <button
                   onClick={clearHistory}
-                  className="text-[10px] font-black uppercase text-slate-400 hover:text-red-500 transition-colors"
+                  className="text-[10px] font-bold text-slate-500 hover:text-rose-400 uppercase transition-colors"
                 >
-                  Clear Logs
+                  Clear
                 </button>
               )}
             </div>
 
             {history.length > 0 ? (
-              <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+              <div className="space-y-2 max-h-56 overflow-y-auto pr-1">
                 {history.map((item) => (
                   <div
                     key={item.id}
                     onClick={() => loadHistoryItem(item)}
-                    className="p-2.5 rounded-lg border border-slate-100 dark:border-slate-800/60 hover:bg-slate-100 dark:hover:bg-slate-800 text-left cursor-pointer transition-all duration-200 flex items-center justify-between gap-2"
+                    className="p-2.5 rounded-xl bg-white/[0.02] border border-white/[0.06] hover:bg-white/[0.06] hover:border-cyan-500/30 text-left cursor-pointer transition-all flex items-center justify-between gap-2"
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 truncate">
+                      <div className="text-xs font-semibold text-slate-300 truncate">
                         {item.snippet}
                       </div>
-                      <div className="text-[10px] text-slate-400 mt-0.5">
-                        {item.timestamp} &bull; Latency: {item.processing_time}
+                      <div className="text-[10px] font-mono text-slate-500 mt-0.5">
+                        {item.timestamp} &bull; {item.processing_time}
                       </div>
                     </div>
-                    <span className={`px-2 py-0.5 rounded text-[9px] font-black uppercase ${
-                      item.prediction === 'Fake Job'
-                        ? 'bg-red-500/10 text-red-500'
-                        : 'bg-emerald-500/10 text-emerald-500'
+                    <span className={`px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase ${
+                      item.prediction === 'Fake Job' ? 'bg-rose-500/15 text-rose-400' : 'bg-emerald-500/15 text-emerald-400'
                     }`}>
                       {item.prediction === 'Fake Job' ? 'Fake' : 'Genuine'}
                     </span>
@@ -788,12 +793,13 @@ Verified using Machine Learning & Explainable AI.`;
                 ))}
               </div>
             ) : (
-              <div className="text-center py-6 text-xs text-slate-400 dark:text-slate-500">
+              <div className="text-center py-6 text-xs text-slate-500 font-mono">
                 No recent predictions logged.
               </div>
             )}
           </GlassCard>
         </div>
+
       </div>
     </div>
   );
