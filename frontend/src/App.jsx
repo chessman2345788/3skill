@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Lenis from 'lenis';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Detector from './pages/Detector';
@@ -18,6 +19,33 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [toast, setToast] = useState(null);
+
+  // Initialize Lenis Smooth Scrolling
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) return;
+
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      gestureOrientation: 'vertical',
+      smoothWheel: true,
+      wheelMultiplier: 0.9,
+    });
+
+    function raf(time) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    }
+    const rafId = requestAnimationFrame(raf);
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      lenis.destroy();
+    };
+  }, []);
+
   useEffect(() => {
     const root = window.document.documentElement;
     if (theme === 'dark') {
@@ -29,6 +57,7 @@ export default function App() {
     }
     localStorage.setItem('theme', theme);
   }, [theme]);
+
 
   // Sync prediction logs to local storage
   useEffect(() => {
