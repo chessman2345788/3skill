@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -7,7 +7,10 @@ import {
   Building2, Globe, Mail, DollarSign, FileText, Eye, Edit3, Info, 
   ChevronRight, Terminal, Activity, ArrowRight, Zap, Play
 } from 'lucide-react';
-import GlassCard from '../components/GlassCard';
+import TiltCard from '../components/motion/TiltCard';
+import MagneticButton from '../components/motion/MagneticButton';
+import AnimatedNumber from '../components/motion/AnimatedNumber';
+import RevealText from '../components/motion/RevealText';
 import ConfidenceMeter from '../components/ConfidenceMeter';
 import { apiService } from '../services/api';
 import { SAMPLE_GENUINE_JOB, SAMPLE_FAKE_JOB } from '../utils/samples';
@@ -112,8 +115,8 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
     setResult(null);
     setAnalysisStage(1);
 
-    const s1 = setTimeout(() => setAnalysisStage(2), 200);
-    const s2 = setTimeout(() => setAnalysisStage(3), 450);
+    const s1 = setTimeout(() => setAnalysisStage(2), 220);
+    const s2 = setTimeout(() => setAnalysisStage(3), 480);
 
     try {
       const res = await apiService.predictJob(textTrimmed);
@@ -158,7 +161,7 @@ export default function Detector({ addHistoryItem, history, clearHistory, showTo
         risk_level: res.risk_level,
         processing_time: res.processing_time
       });
-      showToast('Structured company & role audit completed.', 'success');
+      showToast('Structured entity audit completed.', 'success');
     } catch (err) {
       showToast(err.message || 'Server error occurred during audit.', 'error');
     } finally {
@@ -278,10 +281,12 @@ Verified using Machine Learning & Explainable AI.`;
             <Terminal size={13} />
             <span>NEURAL AUDIT ENGINE // V2.4</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Job Authenticity Detector
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <RevealText
+            text="Job Authenticity Detector"
+            as="h1"
+            className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display"
+          />
+          <p className="text-xs sm:text-sm text-slate-400 font-sans">
             Natural language processing, explainable n-gram attribution, and recruiter DNS inspection.
           </p>
         </div>
@@ -291,7 +296,7 @@ Verified using Machine Learning & Explainable AI.`;
           <button
             type="button"
             onClick={() => { setActiveTab('quick'); setResult(null); }}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all ${
               activeTab === 'quick'
                 ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-xs'
                 : 'text-slate-400 hover:text-white'
@@ -303,7 +308,7 @@ Verified using Machine Learning & Explainable AI.`;
           <button
             type="button"
             onClick={() => { setActiveTab('structured'); setResult(null); }}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-bold transition-all ${
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-mono font-bold transition-all ${
               activeTab === 'structured'
                 ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/30 shadow-xs'
                 : 'text-slate-400 hover:text-white'
@@ -318,27 +323,32 @@ Verified using Machine Learning & Explainable AI.`;
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 items-start">
         
         {/* Left Form / Visualizer Column */}
-        <GlassCard className="lg:col-span-2 space-y-5 p-5 sm:p-7">
-          
+        <TiltCard 
+          baseRotation={0} 
+          enableMouseTilt={false}
+          className="lg:col-span-2 space-y-5 p-5 sm:p-7"
+        >
           {/* Quick Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
             <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
+              <MagneticButton
+                size="sm"
+                variant="secondary"
                 onClick={() => handlePasteSample('genuine')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 transition-all"
+                className="text-emerald-400 border-emerald-500/20"
               >
                 <Sparkles size={12} />
                 <span>Paste Genuine Sample</span>
-              </button>
-              <button
-                type="button"
+              </MagneticButton>
+
+              <MagneticButton
+                size="sm"
+                variant="danger"
                 onClick={() => handlePasteSample('fake')}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all"
               >
                 <Sparkles size={12} />
                 <span>Paste Wire Scam Sample</span>
-              </button>
+              </MagneticButton>
             </div>
 
             <div className="flex items-center gap-2">
@@ -347,7 +357,7 @@ Verified using Machine Learning & Explainable AI.`;
                   <button
                     type="button"
                     onClick={() => setViewMode('input')}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-bold transition-all ${
                       viewMode === 'input'
                         ? 'bg-cyan-500/20 text-cyan-300'
                         : 'text-slate-400 hover:text-white'
@@ -359,7 +369,7 @@ Verified using Machine Learning & Explainable AI.`;
                   <button
                     type="button"
                     onClick={() => setViewMode('highlight')}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold transition-all ${
+                    className={`flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-mono font-bold transition-all ${
                       viewMode === 'highlight'
                         ? 'bg-cyan-500/20 text-cyan-300'
                         : 'text-slate-400 hover:text-white'
@@ -371,7 +381,7 @@ Verified using Machine Learning & Explainable AI.`;
                 </div>
               )}
 
-              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 cursor-pointer transition-all">
+              <label className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 cursor-pointer transition-all">
                 <Upload size={12} />
                 <span>Upload TXT</span>
                 <input
@@ -435,10 +445,10 @@ Verified using Machine Learning & Explainable AI.`;
                 </div>
               )}
 
-              <button
+              <MagneticButton
                 type="submit"
                 disabled={loading || !jobDescriptionQuick.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 via-sky-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-98 transition-all"
+                className="w-full"
                 id="btn-analyze"
               >
                 {loading ? (
@@ -452,7 +462,7 @@ Verified using Machine Learning & Explainable AI.`;
                     <span>Run Neural & Explainability Scan</span>
                   </>
                 )}
-              </button>
+              </MagneticButton>
             </form>
           ) : (
             /* Structured Company Audit Form */
@@ -537,10 +547,10 @@ Verified using Machine Learning & Explainable AI.`;
                 />
               </div>
 
-              <button
+              <MagneticButton
                 type="submit"
                 disabled={loading || !jobDescriptionStruct.trim()}
-                className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs shadow-lg shadow-cyan-500/20 disabled:opacity-50 transition-all"
+                className="w-full"
               >
                 {loading ? (
                   <>
@@ -553,7 +563,7 @@ Verified using Machine Learning & Explainable AI.`;
                     <span>Run Complete Structured Entity Audit</span>
                   </>
                 )}
-              </button>
+              </MagneticButton>
             </form>
           )}
 
@@ -655,7 +665,7 @@ Verified using Machine Learning & Explainable AI.`;
             </motion.div>
           )}
 
-        </GlassCard>
+        </TiltCard>
 
         {/* Right Telemetry & History Column */}
         <div className="space-y-6">
@@ -665,13 +675,16 @@ Verified using Machine Learning & Explainable AI.`;
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               >
-                <GlassCard className={`p-6 space-y-4 border ${
-                  result.prediction === 'Fake Job'
-                    ? 'border-rose-500/30 bg-gradient-to-b from-rose-500/10 to-[#0b0f17]'
-                    : 'border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[#0b0f17]'
-                }`}>
+                <TiltCard 
+                  baseRotation={0}
+                  className={`p-6 space-y-4 border ${
+                    result.prediction === 'Fake Job'
+                      ? 'border-rose-500/30 bg-gradient-to-b from-rose-500/10 to-[#0b0f17]'
+                      : 'border-emerald-500/30 bg-gradient-to-b from-emerald-500/10 to-[#0b0f17]'
+                  }`}
+                >
                   
                   {/* Verdict Badge */}
                   <div className="flex items-center gap-3 border-b border-white/[0.08] pb-4">
@@ -722,37 +735,45 @@ Verified using Machine Learning & Explainable AI.`;
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2 border-t border-white/[0.08]">
-                    <button
+                    <MagneticButton
+                      size="sm"
+                      variant="secondary"
                       onClick={handleCopy}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 transition-all"
+                      className="flex-1"
                     >
                       <Copy size={13} />
                       <span>Copy</span>
-                    </button>
-                    <button
+                    </MagneticButton>
+
+                    <MagneticButton
+                      size="sm"
+                      variant="secondary"
                       onClick={handleDownload}
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 transition-all"
+                      className="flex-1"
                     >
                       <Download size={13} />
                       <span>Download</span>
-                    </button>
+                    </MagneticButton>
                   </div>
 
-                </GlassCard>
+                </TiltCard>
               </motion.div>
             ) : (
-              <GlassCard className="text-center py-12 flex flex-col items-center justify-center border-dashed border border-white/[0.08]">
+              <TiltCard 
+                baseRotation={0}
+                className="text-center py-12 flex flex-col items-center justify-center border-dashed border border-white/[0.08]"
+              >
                 <ShieldCheck size={36} className="text-slate-600 mb-3" />
                 <h4 className="font-mono font-bold text-white text-xs uppercase tracking-wider">Awaiting Vector Stream</h4>
                 <p className="text-xs text-slate-500 max-w-xs mt-1 leading-relaxed">
                   Submit a job description to trigger real-time ML + XAI verification.
                 </p>
-              </GlassCard>
+              </TiltCard>
             )}
           </AnimatePresence>
 
           {/* History Panel */}
-          <GlassCard className="space-y-3 p-5">
+          <TiltCard baseRotation={0} className="space-y-3 p-5">
             <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 text-xs font-mono">
               <span className="font-bold text-white flex items-center gap-1.5">
                 <ClipboardList size={14} className="text-cyan-400" />
@@ -797,7 +818,7 @@ Verified using Machine Learning & Explainable AI.`;
                 No recent predictions logged.
               </div>
             )}
-          </GlassCard>
+          </TiltCard>
         </div>
 
       </div>

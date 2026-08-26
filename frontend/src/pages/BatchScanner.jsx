@@ -5,7 +5,10 @@ import {
   ShieldCheck, ShieldAlert, Search, Sparkles, CheckCircle2, 
   ChevronDown, ChevronUp, Layers, Terminal, ArrowRight
 } from 'lucide-react';
-import GlassCard from '../components/GlassCard';
+import TiltCard from '../components/motion/TiltCard';
+import MagneticButton from '../components/motion/MagneticButton';
+import AnimatedNumber from '../components/motion/AnimatedNumber';
+import RevealText from '../components/motion/RevealText';
 import { apiService } from '../services/api';
 
 const SAMPLE_BATCH = [
@@ -152,26 +155,30 @@ export default function BatchScanner({ showToast }) {
             <Layers size={13} />
             <span>BULK AUDIT TERMINAL</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Bulk Batch Job Scanner
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <RevealText
+            text="Bulk Batch Job Scanner"
+            as="h1"
+            className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display"
+          />
+          <p className="text-xs sm:text-sm text-slate-400 font-sans">
             Parallel AI threat vector evaluation for campus recruitment, placement cells, and job portals.
           </p>
         </div>
 
         {/* Action Toolbar */}
         <div className="flex flex-wrap items-center gap-2">
-          <button
+          <MagneticButton
+            size="sm"
+            variant="secondary"
             onClick={handleLoadSampleBatch}
             disabled={loading}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 transition-all"
+            className="text-cyan-300 border-cyan-500/30"
           >
             <Sparkles size={13} />
             <span>Load Sample 6-Job Batch</span>
-          </button>
+          </MagneticButton>
 
-          <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white cursor-pointer transition-all">
+          <label className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-mono font-bold bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-white cursor-pointer transition-all">
             <Upload size={13} />
             <span>Upload CSV / JSON</span>
             <input
@@ -183,55 +190,60 @@ export default function BatchScanner({ showToast }) {
           </label>
 
           {batchData.length > 0 && (
-            <button
+            <MagneticButton
+              size="sm"
+              variant="primary"
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-white shadow-md transition-all"
+              className="bg-gradient-to-r from-emerald-500 to-teal-600 border-emerald-400/30 shadow-emerald-500/20"
             >
               <Download size={13} />
               <span>Export CSV</span>
-            </button>
+            </MagneticButton>
           )}
         </div>
       </div>
 
-      {/* Summary KPI Cards */}
+      {/* Summary KPI Cards with AnimatedNumber */}
       {summary && (
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           className="grid grid-cols-2 lg:grid-cols-4 gap-4"
         >
-          <GlassCard className="p-4 space-y-1">
+          <TiltCard baseRotation={-0.5} floatDuration={6} className="p-4 space-y-1">
             <span className="text-[10px] font-mono font-bold uppercase text-slate-400">Total Evaluated</span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-white">{batchData.length}</div>
-            <span className="text-[11px] text-slate-500">Postings processed</span>
-          </GlassCard>
+            <AnimatedNumber value={batchData.length} className="text-2xl sm:text-3xl font-mono font-black text-white" />
+            <span className="text-[11px] text-slate-500 block">Postings processed</span>
+          </TiltCard>
 
-          <GlassCard className="p-4 space-y-1 border-rose-500/30 bg-rose-500/5">
+          <TiltCard baseRotation={0.5} floatDuration={7} className="p-4 space-y-1 border-rose-500/30 bg-rose-500/5">
             <span className="text-[10px] font-mono font-bold uppercase text-rose-400">Fraud Ratio</span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-rose-400">{summary.fake_percentage}%</div>
-            <span className="text-[11px] text-rose-400/80">{summary.fake_count} deceptive listings</span>
-          </GlassCard>
+            <AnimatedNumber value={summary.fake_percentage} decimals={1} suffix="%" className="text-2xl sm:text-3xl font-mono font-black text-rose-400" />
+            <span className="text-[11px] text-rose-400/80 block">{summary.fake_count} deceptive listings</span>
+          </TiltCard>
 
-          <GlassCard className="p-4 space-y-1 border-emerald-500/30 bg-emerald-500/5">
+          <TiltCard baseRotation={-0.5} floatDuration={6.5} className="p-4 space-y-1 border-emerald-500/30 bg-emerald-500/5">
             <span className="text-[10px] font-mono font-bold uppercase text-emerald-400">Genuine Ratio</span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-emerald-400">
-              {((summary.genuine_count / batchData.length) * 100).toFixed(1)}%
-            </div>
-            <span className="text-[11px] text-emerald-400/80">{summary.genuine_count} verified authentic</span>
-          </GlassCard>
+            <AnimatedNumber 
+              value={((summary.genuine_count / batchData.length) * 100)} 
+              decimals={1} 
+              suffix="%" 
+              className="text-2xl sm:text-3xl font-mono font-black text-emerald-400" 
+            />
+            <span className="text-[11px] text-emerald-400/80 block">{summary.genuine_count} verified authentic</span>
+          </TiltCard>
 
-          <GlassCard className="p-4 space-y-1 border-amber-500/30 bg-amber-500/5">
+          <TiltCard baseRotation={0.5} floatDuration={7.5} className="p-4 space-y-1 border-amber-500/30 bg-amber-500/5">
             <span className="text-[10px] font-mono font-bold uppercase text-amber-400">Critical Alerts</span>
-            <div className="text-2xl sm:text-3xl font-mono font-black text-amber-400">{summary.high_risk_count}</div>
-            <span className="text-[11px] text-amber-400/80">High severity score</span>
-          </GlassCard>
+            <AnimatedNumber value={summary.high_risk_count} className="text-2xl sm:text-3xl font-mono font-black text-amber-400" />
+            <span className="text-[11px] text-amber-400/80 block">High severity score</span>
+          </TiltCard>
         </motion.div>
       )}
 
       {/* Main Table Interface */}
       {loading ? (
-        <GlassCard className="text-center py-20 space-y-4">
+        <TiltCard baseRotation={0} enableMouseTilt={false} className="text-center py-20 space-y-4">
           <RefreshCw size={36} className="animate-spin text-cyan-400 mx-auto" />
           <div className="space-y-1 font-mono">
             <h3 className="text-base font-bold text-white">EXECUTING BATCH VECTOR INFERENCE...</h3>
@@ -239,9 +251,9 @@ export default function BatchScanner({ showToast }) {
               Parallel evaluation of n-gram weights and semantic risk triggers.
             </p>
           </div>
-        </GlassCard>
+        </TiltCard>
       ) : batchData.length > 0 ? (
-        <GlassCard className="space-y-4 p-5 sm:p-6">
+        <TiltCard baseRotation={0} enableMouseTilt={false} className="space-y-4 p-5 sm:p-6">
           
           {/* Table Header Filter Bar */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.08] pb-4">
@@ -363,10 +375,12 @@ export default function BatchScanner({ showToast }) {
               </tbody>
             </table>
           </div>
-        </GlassCard>
+        </TiltCard>
       ) : (
         /* Empty Dropzone Card */
-        <GlassCard 
+        <TiltCard 
+          baseRotation={0}
+          enableMouseTilt={false}
           onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
           onDragLeave={() => setIsDragOver(false)}
           onDrop={(e) => {
@@ -382,19 +396,21 @@ export default function BatchScanner({ showToast }) {
         >
           <FileSpreadsheet size={44} className="text-slate-600 mx-auto" />
           <div className="space-y-1">
-            <h3 className="font-extrabold text-base text-white">No Dataset Uploaded</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="font-extrabold text-base text-white font-display">No Dataset Uploaded</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto font-sans">
               Drag and drop a .CSV, .JSON file here, or test immediately with our pre-loaded batch dataset.
             </p>
           </div>
-          <button
-            onClick={handleLoadSampleBatch}
-            className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 transition-all"
-          >
-            <Sparkles size={13} />
-            <span>Load Sample 6-Job Dataset</span>
-          </button>
-        </GlassCard>
+          <div className="flex justify-center">
+            <MagneticButton
+              size="sm"
+              onClick={handleLoadSampleBatch}
+            >
+              <Sparkles size={13} />
+              <span>Load Sample 6-Job Dataset</span>
+            </MagneticButton>
+          </div>
+        </TiltCard>
       )}
 
     </div>

@@ -4,7 +4,9 @@ import {
   Radar, GitCompare, ShieldAlert, ShieldCheck, AlertOctagon, 
   HelpCircle, ArrowRight, CheckCircle2, XCircle, Sparkles, RefreshCw, BookmarkCheck, Terminal
 } from 'lucide-react';
-import GlassCard from '../components/GlassCard';
+import TiltCard from '../components/motion/TiltCard';
+import MagneticButton from '../components/motion/MagneticButton';
+import RevealText from '../components/motion/RevealText';
 import { apiService } from '../services/api';
 import { SAMPLE_GENUINE_JOB, SAMPLE_FAKE_JOB } from '../utils/samples';
 
@@ -15,7 +17,8 @@ const SCAM_TAXONOMY = [
     color: 'border-rose-500/30 text-rose-400 bg-rose-500/10',
     summary: 'The "employer" sends a counterfeit cashier check to purchase home office hardware from a "preferred vendor".',
     redFlags: ['Checks sent prior to employment start', 'Demands to wire surplus funds back to third parties', 'Overpayment checks'],
-    advice: 'Never wire money or return funds from a deposited check until your bank fully clears it (up to 14 business days).'
+    advice: 'Never wire money or return funds from a deposited check until your bank fully clears it (up to 14 business days).',
+    rot: -1
   },
   {
     title: 'Telegram / WhatsApp Task Scams',
@@ -23,7 +26,8 @@ const SCAM_TAXONOMY = [
     color: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
     summary: 'Recruiters approach via SMS or messaging apps offering daily wages for rating apps, liking videos, or simple clicks.',
     redFlags: ['Interviews conducted exclusively via Telegram or WhatsApp', 'Mandatory deposits to unlock higher task tiers', 'Crypto-only payouts'],
-    advice: 'Legitimate corporations never conduct formal employee onboarding or interviews via instant messaging channels.'
+    advice: 'Legitimate corporations never conduct formal employee onboarding or interviews via instant messaging channels.',
+    rot: 1
   },
   {
     title: 'Money Mule & Wire Routing',
@@ -31,7 +35,8 @@ const SCAM_TAXONOMY = [
     color: 'border-rose-500/30 text-rose-400 bg-rose-500/10',
     summary: 'Positions disguised as "Payment Processing Assistant" where you receive stolen funds and wire them out.',
     redFlags: ['Using personal bank accounts for company transactions', 'Retaining 5-10% commission per transfer', 'Zero screening or interview'],
-    advice: 'Transferring illicit money makes you legally liable as a money mule under federal banking fraud laws.'
+    advice: 'Transferring illicit money makes you legally liable as a money mule under federal banking fraud laws.',
+    rot: -1.5
   },
   {
     title: 'Package Reshipping Schemes',
@@ -39,7 +44,8 @@ const SCAM_TAXONOMY = [
     color: 'border-amber-500/30 text-amber-400 bg-amber-500/10',
     summary: 'Receiving packages bought with stolen credit cards at your personal residence and repackaging them overseas.',
     redFlags: ['Work-from-home "package inspector" or "merchandise handler"', 'Re-shipping goods internationally', 'No commercial hub address'],
-    advice: 'Legitimate logistics firms operate out of insured commercial fulfillment centers, never residential homes.'
+    advice: 'Legitimate logistics firms operate out of insured commercial fulfillment centers, never residential homes.',
+    rot: 1.2
   },
   {
     title: 'Phishing Onboarding & ID Theft',
@@ -47,7 +53,8 @@ const SCAM_TAXONOMY = [
     color: 'border-purple-500/30 text-purple-400 bg-purple-500/10',
     summary: 'Fake job offers designed solely to harvest SSN, passport scans, and banking credentials during "pre-employment onboarding".',
     redFlags: ['Demanding direct deposit & tax forms before an official signed contract', 'Free email recruiter contacts (@gmail)', 'No verified corporate domain'],
-    advice: 'Verify employer legitimacy with state registries and never supply SSN/SIN without verified contracts.'
+    advice: 'Verify employer legitimacy with state registries and never supply SSN/SIN without verified contracts.',
+    rot: -0.8
   },
   {
     title: 'Upfront Training & Placement Fees',
@@ -55,7 +62,8 @@ const SCAM_TAXONOMY = [
     color: 'border-indigo-500/30 text-indigo-400 bg-indigo-500/10',
     summary: 'Guaranteed placement promises that demand payment for proprietary training, certification, or background checks.',
     redFlags: ['Pay for mandatory training modules', 'Guaranteed high-six-figure placement', 'Upfront software license fees'],
-    advice: 'Real employers pay for required training and onboarding expenses themselves.'
+    advice: 'Real employers pay for required training and onboarding expenses themselves.',
+    rot: 0.8
   }
 ];
 
@@ -98,29 +106,31 @@ export default function ScamRadar({ showToast }) {
             <Radar size={13} />
             <span>THREAT INTELLIGENCE & COMPARATOR</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-            Job Scam Radar & A/B Diff Inspector
-          </h1>
-          <p className="text-xs sm:text-sm text-slate-400">
+          <RevealText
+            text="Job Scam Radar & A/B Diff Inspector"
+            as="h1"
+            className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display"
+          />
+          <p className="text-xs sm:text-sm text-slate-400 font-sans">
             Compare two postings side-by-side and examine modern recruitment fraud taxonomy.
           </p>
         </div>
 
-        <button
+        <MagneticButton
+          size="sm"
           onClick={handleCompare}
           disabled={loadingCompare}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white shadow-lg shadow-cyan-500/20 active:scale-95 transition-all"
         >
           {loadingCompare ? <RefreshCw size={13} className="animate-spin" /> : <Sparkles size={13} />}
           <span>Run A/B Comparison</span>
-        </button>
+        </MagneticButton>
       </div>
 
-      {/* A/B Comparator Panes */}
+      {/* A/B Comparator Panes with living TiltCards */}
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Job A Pane */}
-        <GlassCard className="space-y-4 p-5 sm:p-6">
+        <TiltCard baseRotation={-0.8} className="space-y-4 p-5 sm:p-6">
           <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 font-mono">
             <span className="text-xs font-bold text-cyan-400">CANDIDATE LISTING A</span>
             {resultA && (
@@ -151,10 +161,10 @@ export default function ScamRadar({ showToast }) {
               </div>
             </div>
           )}
-        </GlassCard>
+        </TiltCard>
 
         {/* Job B Pane */}
-        <GlassCard className="space-y-4 p-5 sm:p-6">
+        <TiltCard baseRotation={0.8} className="space-y-4 p-5 sm:p-6">
           <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 font-mono">
             <span className="text-xs font-bold text-indigo-400">CANDIDATE LISTING B</span>
             {resultB && (
@@ -185,23 +195,33 @@ export default function ScamRadar({ showToast }) {
               </div>
             </div>
           )}
-        </GlassCard>
+        </TiltCard>
 
       </section>
 
-      {/* Modern Scam Taxonomy Library */}
+      {/* Modern Scam Taxonomy Library with TiltCards */}
       <section className="space-y-6">
         <div className="space-y-1">
           <span className="text-xs font-mono font-bold text-cyan-400 uppercase tracking-wider">Tactical Intelligence</span>
-          <h2 className="text-2xl font-extrabold text-white">Modern Employment Scam Taxonomy</h2>
-          <p className="text-xs text-slate-400">
+          <RevealText 
+            text="Modern Employment Scam Taxonomy"
+            as="h2"
+            className="text-2xl font-extrabold text-white font-display"
+          />
+          <p className="text-xs text-slate-400 font-sans">
             Real-world tactical breakdown of dominant recruitment fraud models.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {SCAM_TAXONOMY.map((scam, i) => (
-            <GlassCard key={i} className="flex flex-col justify-between space-y-4 p-5">
+            <TiltCard 
+              key={i} 
+              baseRotation={scam.rot}
+              floatDuration={6 + i * 0.5}
+              floatDelay={i * 0.3}
+              className="flex flex-col justify-between space-y-4 p-5"
+            >
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <span className={`px-2.5 py-0.5 rounded-full text-[9px] font-mono font-bold uppercase tracking-wider border ${scam.color}`}>
@@ -210,7 +230,7 @@ export default function ScamRadar({ showToast }) {
                   <AlertOctagon size={15} className="text-rose-400" />
                 </div>
 
-                <h3 className="font-extrabold text-base text-white">
+                <h3 className="font-extrabold text-base text-white font-display">
                   {scam.title}
                 </h3>
 
@@ -235,20 +255,20 @@ export default function ScamRadar({ showToast }) {
                 <span className="font-mono font-bold text-cyan-400 block mb-0.5">🛡️ PROTOCOL RULE:</span>
                 {scam.advice}
               </div>
-            </GlassCard>
+            </TiltCard>
           ))}
         </div>
       </section>
 
       {/* Candidate Pre-Signature Self Defense Protocol */}
-      <GlassCard className="p-6 md:p-8 space-y-4 border-cyan-500/20 bg-gradient-to-b from-[#0e1422] to-[#07090e]">
+      <TiltCard baseRotation={0} enableMouseTilt={false} className="p-6 md:p-8 space-y-4 border-cyan-500/20 bg-gradient-to-b from-[#0e1422] to-[#07090e]">
         <div className="flex items-center gap-2 text-cyan-400">
           <BookmarkCheck size={20} />
-          <h3 className="font-extrabold text-lg text-white">
+          <h3 className="font-extrabold text-lg text-white font-display">
             Job Seeker Self-Defense Protocol
           </h3>
         </div>
-        <p className="text-xs text-slate-400 max-w-2xl">
+        <p className="text-xs text-slate-400 max-w-2xl font-sans">
           Complete these 4 verification checkpoints before submitting personal identifiers or signing offers:
         </p>
 
@@ -270,7 +290,7 @@ export default function ScamRadar({ showToast }) {
             <p className="text-[11px] text-slate-400 font-sans leading-tight">Search the company's official "Careers" portal to confirm the exact Job ID exists.</p>
           </div>
         </div>
-      </GlassCard>
+      </TiltCard>
 
     </div>
   );

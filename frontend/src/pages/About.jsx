@@ -1,7 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { BookOpen, Cpu, Layers, HelpCircle, FileText, Compass, Terminal, Shield, CheckCircle2, Zap } from 'lucide-react';
-import GlassCard from '../components/GlassCard';
+import TiltCard from '../components/motion/TiltCard';
+import RevealText from '../components/motion/RevealText';
 
 export default function About() {
   const containerVariants = {
@@ -31,37 +32,39 @@ export default function About() {
           <Terminal size={13} />
           <span>WHITE PAPER & TECHNICAL SPECIFICATION</span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display">
-          Architecture & ML Methodology
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-400">
+        <RevealText
+          text="Architecture & ML Methodology"
+          as="h1"
+          className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display"
+        />
+        <p className="text-xs sm:text-sm text-slate-400 font-sans">
           How our natural language processing pipeline vectorizes and validates recruitment text.
         </p>
       </motion.div>
 
-      {/* Problem Statement & Corpus */}
+      {/* Problem Statement & Corpus with living TiltCards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <GlassCard className="space-y-3 p-6">
+        <TiltCard baseRotation={-0.8} floatDuration={6.5} className="space-y-3 p-6">
           <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold">
             <BookOpen size={16} />
             <span>01. PROBLEM FORMULATION</span>
           </div>
-          <h2 className="font-extrabold text-base text-white">The Asymmetric Threat of Recruitment Fraud</h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <h2 className="font-extrabold text-base text-white font-display">The Asymmetric Threat of Recruitment Fraud</h2>
+          <p className="text-xs text-slate-400 leading-relaxed font-sans">
             With the rapid rise of remote employment, malicious actors deploy deceptive listings to harvest banking credentials, social security identifiers, or extract advance fees. VeriWork uses high-throughput feature attribution to detect structural anomalies prior to candidate application submission.
           </p>
-        </GlassCard>
+        </TiltCard>
 
-        <GlassCard className="space-y-3 p-6">
+        <TiltCard baseRotation={0.8} floatDuration={7} floatDelay={0.5} className="space-y-3 p-6">
           <div className="flex items-center gap-2 text-emerald-400 font-mono text-xs font-bold">
             <FileText size={16} />
             <span>02. DATASET CORPUS</span>
           </div>
-          <h2 className="font-extrabold text-base text-white">EMNLP 17,880 Training Benchmark</h2>
-          <p className="text-xs text-slate-400 leading-relaxed">
+          <h2 className="font-extrabold text-base text-white font-display">EMNLP 17,880 Training Benchmark</h2>
+          <p className="text-xs text-slate-400 leading-relaxed font-sans">
             The core supervised classifier is trained on the benchmark EMNLP recruitment dataset comprising 17,880 verified advertisements. The training corpus highlights standard structural differentials, including inflated compensation promises, informal interview routes, and payment laundering indicators.
           </p>
-        </GlassCard>
+        </TiltCard>
       </motion.div>
 
       {/* NLP text pre-processing pipeline diagram */}
@@ -71,8 +74,8 @@ export default function About() {
           <span>03. LEXICAL PREPROCESSING PIPELINE</span>
         </div>
         
-        <GlassCard className="space-y-5 p-6">
-          <p className="text-xs text-slate-400 leading-relaxed">
+        <TiltCard baseRotation={0} enableMouseTilt={false} className="space-y-5 p-6">
+          <p className="text-xs text-slate-400 leading-relaxed font-sans">
             Before text matrices are ingested by the Scikit-Learn inference engine, the payload undergoes deterministic token cleaning to eliminate noise and adversarial obfuscation:
           </p>
           
@@ -90,7 +93,7 @@ export default function About() {
               </div>
             ))}
           </div>
-        </GlassCard>
+        </TiltCard>
       </motion.div>
 
       {/* Algorithms comparison */}
@@ -104,28 +107,36 @@ export default function About() {
           {[
             {
               title: 'TF-IDF Feature Space',
-              desc: 'Term Frequency-Inverse Document Frequency. Transforms raw text into numerical sparse feature vectors by scoring word frequencies and down-weighting terms common across standard job descriptions.'
+              desc: 'Term Frequency-Inverse Document Frequency. Transforms raw text into numerical sparse feature vectors by scoring word frequencies and down-weighting terms common across standard job descriptions.',
+              rot: -0.8
             },
             {
               title: 'Logistic Regression',
-              desc: 'Our primary classification model. Evaluates log-odds probabilities to label advertisements. Extremely fast inference speeds (<0.04s) and high regularized accuracy on text features.'
+              desc: 'Our primary classification model. Evaluates log-odds probabilities to label advertisements. Extremely fast inference speeds (<0.04s) and high regularized accuracy on text features.',
+              rot: 0.8
             },
             {
               title: 'Explainable Attribution',
-              desc: 'Extracts exact weights contributing positively or negatively to the class boundary, enabling complete transparency and in-text red-flag phrase highlighting.'
+              desc: 'Extracts exact weights contributing positively or negatively to the class boundary, enabling complete transparency and in-text red-flag phrase highlighting.',
+              rot: -0.5
             }
           ].map((alg, index) => (
-            <GlassCard key={index} className="flex flex-col h-56 space-y-3 justify-between p-6">
+            <TiltCard 
+              key={index} 
+              baseRotation={alg.rot}
+              floatDuration={6 + index * 0.7}
+              className="flex flex-col h-56 space-y-3 justify-between p-6"
+            >
               <h3 className="font-extrabold text-sm text-white font-display">{alg.title}</h3>
               <p className="text-xs text-slate-400 leading-relaxed font-sans">{alg.desc}</p>
-            </GlassCard>
+            </TiltCard>
           ))}
         </div>
       </motion.div>
 
       {/* Future Roadmap */}
       <motion.div variants={itemVariants}>
-        <GlassCard className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border border-cyan-500/20 bg-gradient-to-r from-cyan-500/[0.06] to-transparent p-6">
+        <TiltCard baseRotation={0} enableMouseTilt={false} className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 border border-cyan-500/20 bg-gradient-to-r from-cyan-500/[0.06] to-transparent p-6">
           <div className="space-y-2 max-w-lg">
             <div className="flex items-center gap-2 text-cyan-400 font-mono text-xs font-bold">
               <Compass size={16} />
@@ -135,7 +146,7 @@ export default function About() {
               Upcoming milestones include lightweight transformer fine-tuning (DistilRoBERTa), direct LinkedIn/Indeed Chrome extension sidecar integration, and automated corporate registry API checks.
             </p>
           </div>
-        </GlassCard>
+        </TiltCard>
       </motion.div>
 
     </motion.div>

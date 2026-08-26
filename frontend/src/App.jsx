@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Lenis from 'lenis';
+import { AnimatePresence } from 'framer-motion';
 import MainLayout from './layouts/MainLayout';
 import Home from './pages/Home';
 import Detector from './pages/Detector';
@@ -8,6 +9,7 @@ import ScamRadar from './pages/ScamRadar';
 import About from './pages/About';
 import ApiStatus from './pages/ApiStatus';
 import Toast from './components/Toast';
+import PageTransition from './components/motion/PageTransition';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -58,7 +60,6 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-
   // Sync prediction logs to local storage
   useEffect(() => {
     localStorage.setItem('prediction_history', JSON.stringify(history));
@@ -73,7 +74,6 @@ export default function App() {
   };
 
   const addHistoryItem = (item) => {
-    // Save prediction along with a timestamp, keep last 20 queries
     const newItem = {
       id: Date.now(),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -88,31 +88,46 @@ export default function App() {
   };
 
   const renderPage = () => {
-    switch (currentPage) {
-      case 'home':
-        return <Home setCurrentPage={setCurrentPage} />;
-      case 'detector':
-        return (
-          <Detector
-            addHistoryItem={addHistoryItem}
-            history={history}
-            clearHistory={clearHistory}
-            showToast={showToast}
-          />
-        );
-      case 'batch':
-        return <BatchScanner showToast={showToast} />;
-      case 'radar':
-        return <ScamRadar showToast={showToast} />;
-      case 'about':
-        return <About />;
-      case 'status':
-        return <ApiStatus showToast={showToast} />;
-      default:
-        return <Home setCurrentPage={setCurrentPage} />;
-    }
+    return (
+      <AnimatePresence mode="wait">
+        {currentPage === 'home' && (
+          <PageTransition routeKey="home">
+            <Home setCurrentPage={setCurrentPage} />
+          </PageTransition>
+        )}
+        {currentPage === 'detector' && (
+          <PageTransition routeKey="detector">
+            <Detector
+              addHistoryItem={addHistoryItem}
+              history={history}
+              clearHistory={clearHistory}
+              showToast={showToast}
+            />
+          </PageTransition>
+        )}
+        {currentPage === 'batch' && (
+          <PageTransition routeKey="batch">
+            <BatchScanner showToast={showToast} />
+          </PageTransition>
+        )}
+        {currentPage === 'radar' && (
+          <PageTransition routeKey="radar">
+            <ScamRadar showToast={showToast} />
+          </PageTransition>
+        )}
+        {currentPage === 'about' && (
+          <PageTransition routeKey="about">
+            <About />
+          </PageTransition>
+        )}
+        {currentPage === 'status' && (
+          <PageTransition routeKey="status">
+            <ApiStatus showToast={showToast} />
+          </PageTransition>
+        )}
+      </AnimatePresence>
+    );
   };
-
 
   return (
     <MainLayout

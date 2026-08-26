@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Wifi, WifiOff, RefreshCw, Server, CheckCircle2, AlertOctagon, Terminal, Cpu, Database } from 'lucide-react';
-import GlassCard from '../components/GlassCard';
+import TiltCard from '../components/motion/TiltCard';
+import MagneticButton from '../components/motion/MagneticButton';
+import AnimatedNumber from '../components/motion/AnimatedNumber';
+import RevealText from '../components/motion/RevealText';
 import { apiService } from '../services/api';
 
 export default function ApiStatus({ showToast }) {
@@ -57,36 +60,39 @@ export default function ApiStatus({ showToast }) {
             <Activity size={13} />
             <span>SYSTEM TELEMETRY MONITOR</span>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display">
-            API Health & Latency Diagnostics
-          </h1>
+          <RevealText
+            text="API Health & Latency Diagnostics"
+            as="h1"
+            className="text-2xl sm:text-3xl font-extrabold tracking-tight text-white font-display"
+          />
           <p className="text-xs text-slate-400 font-sans">
             Real-time server heartbeats, model cache integrity, and endpoint latency.
           </p>
         </div>
 
-        <motion.button
+        <MagneticButton
+          size="sm"
+          variant="secondary"
           onClick={() => pingApi(true)}
           disabled={refreshing || status === 'checking'}
-          whileTap={{ scale: 0.95 }}
-          className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.04] hover:bg-white/[0.08] text-slate-300 disabled:opacity-40 transition-colors"
+          className="p-2.5"
           title="Refresh Heartbeat"
         >
-          <RefreshCw size={15} className={refreshing ? 'animate-spin' : ''} />
-        </motion.button>
+          <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+        </MagneticButton>
       </div>
 
       {/* Main Status Display */}
-      <GlassCard className="text-center py-8 px-6 sm:px-10 space-y-6">
+      <TiltCard baseRotation={0} enableMouseTilt={false} className="text-center py-8 px-6 sm:px-10 space-y-6">
         
-        {/* Dynamic Beacon Icon */}
+        {/* Dynamic Beacon Icon with Spring Animation */}
         <div className="flex justify-center">
           {status === 'checking' ? (
             <div className="w-16 h-16 rounded-2xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400">
               <RefreshCw size={26} className="animate-spin text-cyan-400" />
             </div>
           ) : status === 'connected' ? (
-            <div className="relative w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+            <div className="relative w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shadow-[0_0_30px_rgba(16,185,129,0.25)]">
               <Wifi size={28} />
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
@@ -121,7 +127,11 @@ export default function ApiStatus({ showToast }) {
             <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Round-Trip Latency</span>
             <span className="text-base font-extrabold text-white flex items-center gap-1.5">
               <Activity size={14} className="text-cyan-400" />
-              {latency ? `${latency} ms` : '--'}
+              {latency !== null ? (
+                <AnimatedNumber value={latency} suffix=" ms" className="text-base font-extrabold text-white" />
+              ) : (
+                '--'
+              )}
             </span>
           </div>
 
@@ -160,10 +170,12 @@ export default function ApiStatus({ showToast }) {
           </div>
           <div className="flex items-end gap-1.5 h-12 pt-2">
             {latencyHistory.map((val, i) => (
-              <div 
+              <motion.div 
                 key={i} 
-                className="flex-1 rounded-t bg-cyan-500/30 hover:bg-cyan-400 transition-all"
-                style={{ height: `${Math.min(100, Math.max(20, (val / 100) * 100))}%` }}
+                className="flex-1 rounded-t bg-cyan-500/30 hover:bg-cyan-400 transition-colors"
+                initial={{ height: 0 }}
+                animate={{ height: `${Math.min(100, Math.max(20, (val / 100) * 100))}%` }}
+                transition={{ duration: 0.4 }}
                 title={`${val}ms`}
               />
             ))}
@@ -174,7 +186,7 @@ export default function ApiStatus({ showToast }) {
           Last heartbeat checked at: {lastChecked || '--'}
         </div>
 
-      </GlassCard>
+      </TiltCard>
     </div>
   );
 }
